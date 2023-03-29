@@ -67,7 +67,7 @@ class Evaluate:
                 model_save_path = './model/' + self.model_name + '/' + str(season)
                 if not os.path.exists(model_save_path):
                     raise Exception('Model path does not exist')
-                spare_model = TransformerWordEmbeddings(model_save_path, layers='-1')
+                spare_model = TransformerWordEmbeddings(model_save_path, layers='-1, -2, -3, -4')
 
             full_wall_m1, almost_full_wall_m1 = 0, 0
             full_wall_m2, almost_full_wall_m2 = 0, 0
