@@ -10,11 +10,12 @@ from utils import *
 import warnings
 
 class Evaluate:
-    def __init__(self, model_name='elmo', series_dict_path='series_dict.json', results_path='./results'):
+    def __init__(self, model_name='elmo', series_dict_path='series_dict.json', results_path='./results', pre_trained=False):
         self.model_name = model_name
         self.NUM_SEASONS = 15
         self.series_dict_path = series_dict_path
         self.results_path = results_path
+        self.pre_trained = pre_trained
 
     def evaluation(self):
         warnings.filterwarnings("ignore")
@@ -59,12 +60,14 @@ class Evaluate:
         set_seed(seed=42)
         if self.model_name == 'elmo':
             spare_model = ELMoEmbeddings(embedding_mode='top')
+        if self.model_name != 'elmo' and self.pre_trained:
+            spare_model = TransformerWordEmbeddings(self.model_name, layers='-1, -2, -3, -4')
         for season in range(1, self.NUM_SEASONS + 1):
             # set_seed(seed=42)
             # if self.model_name == 'elmo':
             #     spare_model = ELMoEmbeddings(embedding_mode='top')
-            if self.model_name != 'elmo':
-                model_save_path = './model/' + self.model_name + '/' + str(season)
+            if self.model_name != 'elmo' and not self.pre_trained:
+                model_save_path = '/media/saboa/DATA/nlp/' + self.model_name.split('/')[-1] + '/' + str(season)
                 if not os.path.exists(model_save_path):
                     raise Exception('Model path does not exist')
                 spare_model = TransformerWordEmbeddings(model_save_path, layers='-1, -2, -3, -4')
@@ -178,19 +181,19 @@ class Evaluate:
             oc_results_6['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_6)), 3)
             oc_results_6['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_6)), 3)
             oc_results_6['ARS'][season - 1] = np.round(np.mean(ars_6), 3)
-            oc_results_6['ARS_lst'][season - 1] = ars_6
+            oc_results_6['ARS_lst'][season - 1] = str(ars_6)
             oc_results_6['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_6)), 3)
             oc_results_6['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_6)), 3)
             oc_results_6['RS'][season - 1] = np.round(np.mean(rs_6), 3)
-            oc_results_6['RS_lst'][season - 1] = rs_6
+            oc_results_6['RS_lst'][season - 1] = str(rs_6)
             oc_results_6['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_6)), 3)
             oc_results_6['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_6)), 3)
             oc_results_6['AMIS'][season - 1] = np.round(np.mean(amis_6), 3)
-            oc_results_6['AMIS_lst'][season - 1] = amis_6
+            oc_results_6['AMIS_lst'][season - 1] = str(amis_6)
             oc_results_6['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_6)), 3)
             oc_results_6['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_6)), 3)
             oc_results_6['NMIS'][season - 1] = np.round(np.mean(nmis_6), 3)
-            oc_results_6['NMIS_lst'][season - 1] = nmis_6
+            oc_results_6['NMIS_lst'][season - 1] = str(nmis_6)
             # oc_results_6['Triplet_accuracy'][season-1] = triplet_accuracy
 
             oc_results_5['Full_wall'][season - 1] = int(full_wall_m5)
@@ -198,19 +201,19 @@ class Evaluate:
             oc_results_5['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_5)), 3)
             oc_results_5['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_5)), 3)
             oc_results_5['ARS'][season - 1] = np.round(np.mean(ars_5), 3)
-            oc_results_5['ARS_lst'][season - 1] = ars_5
+            oc_results_5['ARS_lst'][season - 1] = str(ars_5)
             oc_results_5['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_5)), 3)
             oc_results_5['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_5)), 3)
             oc_results_5['RS'][season - 1] = np.round(np.mean(rs_5), 3)
-            oc_results_5['RS_lst'][season - 1] = rs_5
+            oc_results_5['RS_lst'][season - 1] = str(rs_5)
             oc_results_5['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_5)), 3)
             oc_results_5['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_5)), 3)
             oc_results_5['AMIS'][season - 1] = np.round(np.mean(amis_5), 3)
-            oc_results_5['AMIS_lst'][season - 1] = amis_5
+            oc_results_5['AMIS_lst'][season - 1] = str(amis_5)
             oc_results_5['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_5)), 3)
             oc_results_5['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_5)), 3)
             oc_results_5['NMIS'][season - 1] = np.round(np.mean(nmis_5), 3)
-            oc_results_5['NMIS_lst'][season - 1] = nmis_5
+            oc_results_5['NMIS_lst'][season - 1] = str(nmis_5)
             # oc_results_5['Triplet_accuracy'][season-1] = triplet_accuracy
 
             oc_results_4['Full_wall'][season - 1] = int(full_wall_m4)
@@ -218,19 +221,19 @@ class Evaluate:
             oc_results_4['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_4)), 3)
             oc_results_4['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_4)), 3)
             oc_results_4['ARS'][season - 1] = np.round(np.mean(ars_4), 3)
-            oc_results_4['ARS_lst'][season - 1] = ars_4
+            oc_results_4['ARS_lst'][season - 1] = str(ars_4)
             oc_results_4['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_4)), 3)
             oc_results_4['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_4)), 3)
             oc_results_4['RS'][season - 1] = np.round(np.mean(rs_4), 3)
-            oc_results_4['RS_lst'][season - 1] = rs_4
+            oc_results_4['RS_lst'][season - 1] = str(rs_4)
             oc_results_4['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_4)), 3)
             oc_results_4['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_4)), 3)
             oc_results_4['AMIS'][season - 1] = np.round(np.mean(amis_4), 3)
-            oc_results_4['AMIS_lst'][season - 1] = amis_4
+            oc_results_4['AMIS_lst'][season - 1] = str(amis_4)
             oc_results_4['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_4)), 3)
             oc_results_4['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_4)), 3)
             oc_results_4['NMIS'][season - 1] = np.round(np.mean(nmis_4), 3)
-            oc_results_4['NMIS_lst'][season - 1] = nmis_4
+            oc_results_4['NMIS_lst'][season - 1] = str(nmis_4)
             # oc_results_4['Triplet_accuracy'][season-1] = triplet_accuracy
 
             oc_results_3['Full_wall'][season - 1] = int(full_wall_m3)
@@ -238,19 +241,19 @@ class Evaluate:
             oc_results_3['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_3)), 3)
             oc_results_3['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_3)), 3)
             oc_results_3['ARS'][season - 1] = np.round(np.mean(ars_3), 3)
-            oc_results_3['ARS_lst'][season - 1] = ars_3
+            oc_results_3['ARS_lst'][season - 1] = str(ars_3)
             oc_results_3['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_3)), 3)
             oc_results_3['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_3)), 3)
             oc_results_3['RS'][season - 1] = np.round(np.mean(rs_3), 3)
-            oc_results_3['RS_lst'][season - 1] = rs_3
+            oc_results_3['RS_lst'][season - 1] = str(rs_3)
             oc_results_3['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_3)), 3)
             oc_results_3['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_3)), 3)
             oc_results_3['AMIS'][season - 1] = np.round(np.mean(amis_3), 3)
-            oc_results_3['AMIS_lst'][season - 1] = amis_3
+            oc_results_3['AMIS_lst'][season - 1] = str(amis_3)
             oc_results_3['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_3)), 3)
             oc_results_3['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_3)), 3)
             oc_results_3['NMIS'][season - 1] = np.round(np.mean(nmis_3), 3)
-            oc_results_3['NMIS_lst'][season - 1] = nmis_3
+            oc_results_3['NMIS_lst'][season - 1] = str(nmis_3)
             # oc_results_3['Triplet_accuracy'][season-1] = triplet_accuracy
 
             oc_results_2['Full_wall'][season - 1] = int(full_wall_m2)
@@ -258,19 +261,19 @@ class Evaluate:
             oc_results_2['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_2)), 3)
             oc_results_2['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_2)), 3)
             oc_results_2['ARS'][season - 1] = np.round(np.mean(ars_2), 3)
-            oc_results_2['ARS_lst'][season - 1] = ars_2
+            oc_results_2['ARS_lst'][season - 1] = str(ars_2)
             oc_results_2['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_2)), 3)
             oc_results_2['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_2)), 3)
             oc_results_2['RS'][season - 1] = np.round(np.mean(rs_2), 3)
-            oc_results_2['RS_lst'][season - 1] = rs_2
+            oc_results_2['RS_lst'][season - 1] = str(rs_2)
             oc_results_2['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_2)), 3)
             oc_results_2['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_2)), 3)
             oc_results_2['AMIS'][season - 1] = np.round(np.mean(amis_2), 3)
-            oc_results_2['AMIS_lst'][season - 1] = amis_2
+            oc_results_2['AMIS_lst'][season - 1] = str(amis_2)
             oc_results_2['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_2)), 3)
             oc_results_2['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_2)), 3)
             oc_results_2['NMIS'][season - 1] = np.round(np.mean(nmis_2), 3)
-            oc_results_2['NMIS_lst'][season - 1] = nmis_2
+            oc_results_2['NMIS_lst'][season - 1] = str(nmis_2)
             # oc_results_2['Triplet_accuracy'][season-1] = triplet_accuracy
 
             oc_results_1['Full_wall'][season - 1] = int(full_wall_m1)
@@ -278,19 +281,19 @@ class Evaluate:
             oc_results_1['ARS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(ars_1)), 3)
             oc_results_1['ARS_hmean'][season - 1] = np.round(hmean(np.abs(ars_1)), 3)
             oc_results_1['ARS'][season - 1] = np.round(np.mean(ars_1), 3)
-            oc_results_1['ARS_lst'][season - 1] = ars_1
+            oc_results_1['ARS_lst'][season - 1] = str(ars_1)
             oc_results_1['RS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(rs_1)), 3)
             oc_results_1['RS_hmean'][season - 1] = np.round(hmean(np.abs(rs_1)), 3)
             oc_results_1['RS'][season - 1] = np.round(np.mean(rs_1), 3)
-            oc_results_1['RS_lst'][season - 1] = rs_1
+            oc_results_1['RS_lst'][season - 1] = str(rs_1)
             oc_results_1['AMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(amis_1)), 3)
             oc_results_1['AMIS_hmean'][season - 1] = np.round(hmean(np.abs(amis_1)), 3)
             oc_results_1['AMIS'][season - 1] = np.round(np.mean(amis_1), 3)
-            oc_results_1['AMIS_lst'][season - 1] = amis_1
+            oc_results_1['AMIS_lst'][season - 1] = str(amis_1)
             oc_results_1['NMIS_gmean'][season - 1] = np.round(geo_mean_overflow(np.abs(nmis_1)), 3)
             oc_results_1['NMIS_hmean'][season - 1] = np.round(hmean(np.abs(nmis_1)), 3)
             oc_results_1['NMIS'][season - 1] = np.round(np.mean(nmis_1), 3)
-            oc_results_1['NMIS_lst'][season - 1] = nmis_1
+            oc_results_1['NMIS_lst'][season - 1] = str(nmis_1)
             # oc_results_1['Triplet_accuracy'][season-1] = triplet_accuracy
 
             total_wall_m1 += full_wall_m1
@@ -440,7 +443,7 @@ class Evaluate:
         # oc_results_6['Excluded_walls'][self.NUM_SEASONS] = excluded_walls
 
         with pd.ExcelWriter(self.results_path + '/only_connect_results_'
-                            + self.model_name + '.xlsx', engine='xlsxwriter') as writer:
+                            + self.model_name.split('/')[-1] + '.xlsx', engine='xlsxwriter') as writer:
             oc_results_6.to_excel(writer, 'ssm_tsne', index=False)
             oc_results_5.to_excel(writer, 'tsne', index=False)
             oc_results_4.to_excel(writer, 'ssm_pca', index=False)
@@ -452,4 +455,7 @@ class Evaluate:
 
 
 if __name__ == '__main__':
-    Evaluate(model_name='elmo').evaluation()
+    # if you want to use a pre-trained model, set pre_trained to True
+    # if pre_trained is True, the model_name should be from huggingface's model hub
+    # https://huggingface.co/transformers/v3.3.1/pretrained_models.html or sentence-transformers/models
+    Evaluate(model_name='intfloat/e5-base', pre_trained=False).evaluation()
