@@ -23,6 +23,11 @@ from scipy import interpolate
 import os
 import warnings
 from df_utils import *
+import openai
+import re
+
+# add your OpenAI API key
+openai.api_key = open("key.txt", "r").read().strip('\n')
 
 warnings.filterwarnings("ignore")
 EPISODE_ITEMS = 32
@@ -296,3 +301,73 @@ def create_dataset_json(path, dataset_json_original, num_seasons=15):
                 outfile.write('\n')
         outfile.close()
         print("json datasets successfully created!")
+
+### functions related to GPT model ###
+def get_completion(wall1, model="gpt-4"):
+    completion = openai.ChatCompletion.create(
+    model=model,
+    # max_tokens=125,
+    messages=[{"role": "assistant", "content": "for each group describe the relationship in first line and group four words in second single line separated by comma without any further explanation. only write the given words in the second line."},
+              {"role": "user", "content": "group the following words into 4 groups of related 4: " + wall1}],
+                 temperature=0)
+    return completion.choices[0].message.content
+
+def examine_wall_gpt(gpt_content, wall1_default):
+    GROUP_WORDS = 4
+    ITEM_NUM = 16
+    reply_content = gpt_content
+    lst_words = []
+    lst_groups = []
+    flag = False
+
+    if '- ' in gpt_content or ' -' in gpt_content:
+        flag = True
+        reply_content = reply_content.replace('- ', '')
+    reply = reply_content.split('\n\n')
+    for i in range(4):
+        replay_split = reply[i].split('\n')
+        if flag:
+            lst_words += replay_split[1:]
+        else:
+            lst_words += replay_split[1].split(', ')
+        lst_groups += re.findall(r'(?<=: )(.*)', replay_split[0])*4
+
+    lst_words_default = wall1_default
+    correct_groups = 0
+    for i in range(GROUP_WORDS, ITEM_NUM+1, GROUP_WORDS):
+        for j in range(GROUP_WORDS, ITEM_NUM+1, GROUP_WORDS):
+            if sorted(lst_words[i-GROUP_WORDS:i]) == sorted(lst_words_default[j-GROUP_WORDS:j]):
+                correct_groups += 1
+                # print(lst_words[i-GROUP_WORDS:i])
+    return correct_groups, lst_words, lst_groups
+
+def word2index(lst_words, wall1_default):
+    dict_bbb = {}
+    lst_aaa_new = []
+    lst_default = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+    for i in range(len(wall1_default)):
+        dict_bbb[wall1_default[i]] = lst_default[i]
+    lst_words_new = lst_words.copy()
+    for i in lst_words_new:
+        lst_words_new[lst_words_new.index(i)] = dict_bbb[i]
+    return lst_words_new, lst_default
+
+def wall_evaluator_gpt(num_default=0, wall_skip=0):
+    df_new = DataFrameUtils().preprocess_text()
+    wall_info = {}
+    num = (num_default * EPISODE_ITEMS) + (wall_skip * WALL_ITEMS)
+    wall1_default = df_new[int(num - WALL_ITEMS):int(num)]['Names'].tolist()
+    wall_info['names'] = wall1_default
+    wall1_shuffled = wall1_default.copy()
+    random.shuffle(wall1_shuffled)
+    wall1 = " ".join(wall1_shuffled)
+    gpt_content = get_completion(wall1).lower()
+    correct_groups, lst_words, lst_groups = examine_wall_gpt(gpt_content, wall1_default)
+    lst_words_new, lst_default = word2index(lst_words, wall1_default)
+    clf_embeds_metrics = wall_evaluation(label=lst_words_new, label_true=lst_default)
+    wall_info['correct_groups'] = correct_groups
+    wall_info['predicted_relationships'] = lst_groups
+    wall_info['predicted_groups'] = lst_words
+    wall_info['scores'] = clf_embeds_metrics
+
+    return wall_info
