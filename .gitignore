@@ -15,6 +15,11 @@ only_connect_nlp.iml
 # Experimental (local user-specific stuff)
 experimental
 
+# Node JS
+node_modules
+package-lock.json
+package.json
+
 # PyCharm
 .idea/
 .idea/workspace.xml
