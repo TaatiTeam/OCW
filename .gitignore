@@ -107,3 +107,6 @@ venv.bak/
 dmypy.json
 
 
+node_modules
+package-lock.json
+package.json
