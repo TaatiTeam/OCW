@@ -14,6 +14,7 @@ only_connect_nlp.iml
 
 # Experimental (local user-specific stuff)
 experimental
+local
 
 # PyCharm
 .idea/
