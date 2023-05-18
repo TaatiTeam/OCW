@@ -41,19 +41,19 @@ class LoadDataset:
 class PretrainedModelLoader:
     def __init__(self, model_name='bert'):
         self.model_name = model_name
-        self.MODEL_LST = ['bert-base-uncased', 'roberta-base', 'distilbert-base-uncased']
-        self.MODEL_LST_ST = ["all-mpnet-base-v2"]
+        # self.MODEL_LST = ['bert-base-uncased', 'roberta-base', 'distilbert-base-uncased']
+        # self.MODEL_LST_ST = ["all-mpnet-base-v2"]
 
     def load_model(self):
-        identifier = ['bert', 'roberta', 'distilbert', 'mpnet']
-        if self.model_name not in identifier:
-            raise ValueError('model name not supported')
-        if self.model_name == 'mpnet':
-            # load pretrained model
-            model = SentenceTransformer("sentence-transformers/" + self.MODEL_LST_ST[0])
+        # identifier = ['bert', 'roberta', 'distilbert', 'mpnet']
+        # if self.model_name not in identifier:
+        #     raise ValueError('model name not supported')
+        if self.model_name.split('/')[0] == 'sentence-transformers' or self.model_name.split('/')[0] == 'microsoft':
+            # load pretrained model from sentence transformers
+            model = SentenceTransformer(self.model_name)
         else:
             # if not sentence transformer:
-            word_embedding_model = models.Transformer(self.MODEL_LST[identifier.index(self.model_name)])
+            word_embedding_model = models.Transformer(self.model_name)
             pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
             model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
@@ -61,7 +61,7 @@ class PretrainedModelLoader:
 
 ### fine-tune transformers with implementation of one-season-out cross validation
 class TransformerTrainer:
-    def __init__(self, model_save_dir='./model', train_dataset_dir='./dataset',
+    def __init__(self, model_save_dir='/media/saboa/DATA/nlp', train_dataset_dir='./dataset',
                  val_dataset_dir='./dataset', model_name='bert', batch_size=16, num_epochs=10, num_seasons=15):
         self.model_name = model_name
         self.model_save_dir = model_save_dir
@@ -76,7 +76,7 @@ class TransformerTrainer:
         # load dataset
         dataset = LoadDataset(self.train_dataset_dir, self.val_dataset_dir)
         for season in range(1, self.num_seasons+1):
-            model_save_path = self.model_save_dir + '/' + self.model_name + '/' + str(season)
+            model_save_path = self.model_save_dir + '/' + self.model_name.split('/')[-1] + '/' + str(season)
             if not os.path.exists(model_save_path):
                 os.makedirs(model_save_path)
 
@@ -103,5 +103,5 @@ class TransformerTrainer:
 
 
 if __name__ == '__main__':
-    trainer = TransformerTrainer(model_name='roberta')
+    trainer = TransformerTrainer(model_name='microsoft/deberta-v3-base')
     trainer.train()
