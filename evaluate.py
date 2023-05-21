@@ -5,11 +5,13 @@ from sklearn.metrics import normalized_mutual_info_score as nmi
 from arguments import get_args
 
 class Evaluate:
-    def __init__(self, prediction_file, dataset_path='./', results_path='./results', seed=42):
+    def __init__(self, prediction_file, dataset_path='./', results_path='./results', split="test", seed=42):
         self.prediction_json = prediction_file
         self.dataset_path = dataset_path
         self.results_path = results_path
+        self.split = split
         self.seed = seed
+
         self.ARI = []
         self.NMI = []
         self.FULL_WALL = 0
@@ -22,7 +24,7 @@ class Evaluate:
             raise Exception('Dataset path does not exist')
         dataset = load_hf_dataset(self.dataset_path)
         prediction = load_prediction(self.prediction_json)
-        for wall in tqdm(dataset['test']):
+        for wall in tqdm(dataset[self.split]):
             gt_words = [i['gt_words'] for i in wall['groups'].values()]
             pred_words = find_wall(wall['wall_id'], prediction)
             gt_sorted = [sorted(i) for i in gt_words]
