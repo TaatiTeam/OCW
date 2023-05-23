@@ -1,41 +1,22 @@
-import json
-import numpy as np
-import pandas as pd
+from datasets import load_dataset
 import matplotlib.pyplot as plt
 from flair.data import Sentence
-from flair.embeddings import ELMoEmbeddings
-from flair.embeddings import TransformerWordEmbeddings
 import flair
 import torch
-from torch import nn
 from k_means_constrained import KMeansConstrained
 import random
-from sklearn.metrics.cluster import adjusted_rand_score
-from sklearn.metrics import rand_score
-from sklearn.metrics import adjusted_mutual_info_score
-from sklearn.metrics import normalized_mutual_info_score
-from scipy.stats import hmean
 from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.manifold import TSNE
 from scipy.spatial import ConvexHull
 from scipy import interpolate
 import os
-import warnings
-from df_utils import *
-import openai
 import re
+import numpy as np
+import json
 
 # add your OpenAI API key
-openai.api_key = open("key.txt", "r").read().strip('\n')
-
-warnings.filterwarnings("ignore")
-EPISODE_ITEMS = 32
-WALL_ITEMS = EPISODE_ITEMS / 2
-LABEL_TRUE = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3])
-U_LABEL_TRUE = np.unique(LABEL_TRUE)
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
+# openai.api_key = open("key.txt", "r").read().strip('\n')
 
 # function to get embeddings of a string from Flair Library
 def get_embeddings(embeddings, sentence):
@@ -83,10 +64,6 @@ def compute_plot_similarity(embedding, wall):
     return plot_similarity_matrix(wall1_sims.cpu().numpy())
 
 
-def geo_mean_overflow(iterable):
-    return np.exp(np.log(iterable).mean())
-
-
 def load_pca(n_components=2, seed=42):
     # Load PCA
     pca = PCA(n_components=n_components, random_state=seed)
@@ -114,234 +91,97 @@ def load_clf(seed=42):
         random_state=seed)
     return clf
 
+# def plot_solved_wall(embeddings, wall_skip, wall1_default, wall_info, dim_reduction='tsne', saved_path=None):
+#     if not saved_path:
+#         saved_path = './nlp_plots/'
+#         saved_file = 'wall' + str(wall1_default) + str(wall_skip) + '_' + dim_reduction + '.jpg'
+#     if not os.path.isdir(saved_path):
+#         os.mkdir(saved_path)
+#     if dim_reduction == 'tsne':
+#         df_tsne = load_tsne().fit_transform(embeddings.cpu())
+#     elif dim_reduction == 'pca':
+#         df_tsne = load_pca().fit_transform(embeddings.cpu())
+#     elif dim_reduction == 'kernel_pca':
+#         df_tsne = load_kpca().fit_transform(embeddings.cpu())
+#     else:
+#         raise ValueError('No Valid Dimentionality Reduction Was Found')
+#
+#     wall_info = wall_evaluator(wall_skip=wall_skip, embeddings=embeddings, dim_reduction=dim_reduction, seed=42)
+#     label = wall_info['clf_embeds'][0]
+#
+#     # Getting unique labels
+#     u_labels = np.unique(label)
+#
+#     emmbedes_lst = wall1_default
+#     # centroids = clf.cluster_centers_
+#     colors = ['purple', 'green', 'red', 'blue']
+#     plt.figure(figsize=(14, 8))
+#     # plotting the results:
+#     j = 0
+#     for i in U_LABEL_TRUE:
+#         plt.scatter(df_tsne[LABEL_TRUE == i, 0], df_tsne[LABEL_TRUE == i, 1], label='Group ' + str(i + 1), s=100,
+#                     color=colors[i])
+#     for name, x, y in zip(emmbedes_lst, df_tsne[:, 0], df_tsne[:, 1]):
+#         plt.annotate(name, xy=(x, y), xytext=(-15, 10), textcoords='offset points')
+#
+#     # Plot the centroids as a black X
+#     # plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', color='k')
+#
+#     # draw enclosure
+#     for i in label:
+#         points = df_tsne[label == i]
+#         # get convex hull
+#         hull = ConvexHull(points)
+#         # get x and y coordinates
+#         # repeat last point to close the polygon
+#         x_hull = np.append(points[hull.vertices, 0],
+#                            points[hull.vertices, 0][0])
+#         y_hull = np.append(points[hull.vertices, 1],
+#                            points[hull.vertices, 1][0])
+#         # # plot shape
+#         # plt.fill(x_hull, y_hull, alpha=0.3, c='gainsboro')
+#
+#         # interpolate
+#         dist = np.sqrt((x_hull[:-1] - x_hull[1:]) ** 2 + (y_hull[:-1] - y_hull[1:]) ** 2)
+#         dist_along = np.concatenate(([0], dist.cumsum()))
+#         spline, u = interpolate.splprep([x_hull, y_hull],
+#                                         u=dist_along, s=0)
+#         interp_d = np.linspace(dist_along[0], dist_along[-1], 50)
+#         interp_x, interp_y = interpolate.splev(interp_d, spline)
+#         # plot shape
+#         plt.fill(interp_x, interp_y, '--', c='gainsboro', alpha=0.1)
+#
+#     plt.grid(b=None)
+#     plt.legend()
+#     # plt.show()
+#
+#     plt.savefig(saved_path + saved_file, dpi=300)
 
-def wall_evaluation(label, label_true=LABEL_TRUE, metrics=['ars', 'rs', 'amis', 'nmis']):
-    metric_dict = {}
-    if not metrics or len(metrics) > 4:
-        raise ValueError('metrics must be a list of length 1-4')
-    if 'ars' in metrics:
-        ars = adjusted_rand_score(label, label_true)
-        metric_dict['ars'] = ars
-    if 'rs' in metrics:
-        rs = rand_score(label, label_true)
-        metric_dict['rs'] = rs
-    if 'amis' in metrics:
-        amis = adjusted_mutual_info_score(label, label_true)
-        metric_dict['amis'] = amis
-    if 'nmis' in metrics:
-        nmis = normalized_mutual_info_score(label, label_true)
-        metric_dict['nmis'] = nmis
-    return metric_dict
-
-
-# evaluates a single wall
-def wall_evaluator(num_default=0, wall_skip=0, embeddings=None, dim_reduction='tsne', seed=42):
-    if not embeddings:
-        raise ValueError('embeddings must be a Flair embedding object')
-    set_seed(seed=seed)
-    clf = load_clf()
-    pca = load_pca()
-    tsne = load_tsne()
-    df_new = DataFrameUtils().preprocess_text()
-    wall_info = {}
-    num = (num_default * EPISODE_ITEMS) + (wall_skip * WALL_ITEMS)
-    wall1_default = df_new[int(num - WALL_ITEMS):int(num)]['Names'].tolist()
-    wall_info['names'] = wall1_default
-    wall1_shuffled = wall1_default.copy()
-    random.shuffle(wall1_shuffled)
-    wall1 = " ".join(wall1_shuffled)
-    wall1_embed = get_embeddings(embeddings, wall1)
-    wall1_embed_sims = cosine_similarity(wall1_embed, wall1_embed)
-
-    # method1 => clf + embeds
-    clf_embeds = clf.fit_predict(wall1_embed.cpu())
-    clf_embeds = clf.labels_
-    clf_embeds_metrics = wall_evaluation(clf_embeds)
-    wall_info['clf_embeds'] = (clf_embeds, clf_embeds_metrics)
-
-    # method2 => clf + ssm
-    clf_embeds_ssm = clf.fit_predict(wall1_embed_sims.cpu())
-    clf_embeds_ssm = clf.labels_
-    clf_embeds_ssm_metrics = wall_evaluation(clf_embeds_ssm)
-    wall_info['clf_embeds_ssm'] = (clf_embeds_ssm, clf_embeds_ssm_metrics)
-
-    # method3 => pca + clf + embeds
-    clf_pca_embeds = clf.fit_predict(pca.fit_transform(wall1_embed.cpu()))
-    clf_pca_embeds = clf.labels_
-    clf_pca_embeds_metrics = wall_evaluation(clf_pca_embeds)
-    wall_info['clf_pca_embeds'] = (clf_pca_embeds, clf_pca_embeds_metrics)
-
-    # method4 => pca + clf + ssm
-    clf_pca_embeds_ssm = clf.fit_predict(pca.fit_transform(wall1_embed_sims.cpu()))
-    clf_pca_embeds_ssm = clf.labels_
-    clf_pca_embeds_ssm_metrics = wall_evaluation(clf_pca_embeds_ssm)
-    wall_info['clf_pca_embeds_ssm'] = (clf_pca_embeds_ssm, clf_pca_embeds_ssm_metrics)
-
-    # method5 => tsne + clf + embeds
-    clf_tsne_embeds = clf.fit_predict(tsne.fit_transform(wall1_embed.cpu()))
-    clf_tsne_embeds = clf.labels_
-    clf_tsne_embeds_metrics = wall_evaluation(clf_tsne_embeds)
-    wall_info['clf_tsne_embeds'] = (clf_tsne_embeds, clf_tsne_embeds_metrics)
-
-    # method6 => tsne + clf + ssm
-    clf_tsne_embeds_ssm = clf.fit_predict(tsne.fit_transform(wall1_embed_sims.cpu()))
-    clf_tsne_embeds_ssm = clf.labels_
-    clf_tsne_embeds_ssm_metrics = wall_evaluation(clf_tsne_embeds_ssm)
-    wall_info['clf_tsne_embeds_ssm'] = (clf_tsne_embeds_ssm, clf_tsne_embeds_ssm_metrics)
-
-    # plot & save solved wall
-    # plot_solved_wall(wall1_embed, wall_skip, wall1_default, dim_reduction=dim_reduction, wall_info= wall_info)
-
-    return wall_info
+### functions useful for new script and dataset ###
+def load_hf_dataset(dataset_path):
+    dataset = load_dataset('json', data_files={'train': dataset_path + 'train.json',
+                                               'validation': dataset_path + 'validation.json',
+                                               'test': dataset_path + 'test.json'}, field='dataset')
+    return dataset
 
 
-def plot_solved_wall(embeddings, wall_skip, wall1_default, wall_info, dim_reduction='tsne', saved_path=None):
-    if not saved_path:
-        saved_path = './nlp_plots/'
-        saved_file = 'wall' + str(wall1_default) + str(wall_skip) + '_' + dim_reduction + '.jpg'
-    if not os.path.isdir(saved_path):
-        os.mkdir(saved_path)
-    if dim_reduction == 'tsne':
-        df_tsne = load_tsne().fit_transform(embeddings.cpu())
-    elif dim_reduction == 'pca':
-        df_tsne = load_pca().fit_transform(embeddings.cpu())
-    elif dim_reduction == 'kernel_pca':
-        df_tsne = load_kpca().fit_transform(embeddings.cpu())
-    else:
-        raise ValueError('No Valid Dimentionality Reduction Was Found')
-
-    # predict the labels of clusters.
-    # label = clf.fit_predict(df_tsne)
-    # label = clf.fit_predict(wall1_elmo_sims.cpu())
-    # label = clf.labels_
-    wall_info = wall_evaluator(wall_skip=wall_skip, embeddings=embeddings, dim_reduction=dim_reduction, seed=42)
-    label = wall_info['clf_embeds'][0]
-
-    # Getting unique labels
-    u_labels = np.unique(label)
-
-    emmbedes_lst = wall1_default
-    # centroids = clf.cluster_centers_
-    # colors = ['purple','purple','purple','purple', 'green','green','green','green', 'red','red','red','red', 'blue','blue','blue','blue']
-    colors = ['purple', 'green', 'red', 'blue']
-    # df_tsne['KMeans_cluster_constrained'][start_len:start_len+16] = clf.labels_
-    plt.figure(figsize=(14, 8))
-    # plotting the results:
-    j = 0
-    for i in U_LABEL_TRUE:
-        plt.scatter(df_tsne[LABEL_TRUE == i, 0], df_tsne[LABEL_TRUE == i, 1], label='Group ' + str(i + 1), s=100,
-                    color=colors[i])
-    for name, x, y in zip(emmbedes_lst, df_tsne[:, 0], df_tsne[:, 1]):
-        plt.annotate(name, xy=(x, y), xytext=(-15, 10), textcoords='offset points')
-
-    # Plot the centroids as a black X
-    # plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', color='k')
-
-    # draw enclosure
-    for i in label:
-        points = df_tsne[label == i]
-        # get convex hull
-        hull = ConvexHull(points)
-        # get x and y coordinates
-        # repeat last point to close the polygon
-        x_hull = np.append(points[hull.vertices, 0],
-                           points[hull.vertices, 0][0])
-        y_hull = np.append(points[hull.vertices, 1],
-                           points[hull.vertices, 1][0])
-        # # plot shape
-        # plt.fill(x_hull, y_hull, alpha=0.3, c='gainsboro')
-
-        # interpolate
-        dist = np.sqrt((x_hull[:-1] - x_hull[1:]) ** 2 + (y_hull[:-1] - y_hull[1:]) ** 2)
-        dist_along = np.concatenate(([0], dist.cumsum()))
-        spline, u = interpolate.splprep([x_hull, y_hull],
-                                        u=dist_along, s=0)
-        interp_d = np.linspace(dist_along[0], dist_along[-1], 50)
-        interp_x, interp_y = interpolate.splev(interp_d, spline)
-        # plot shape
-        plt.fill(interp_x, interp_y, '--', c='gainsboro', alpha=0.1)
-
-    plt.grid(b=None)
-    plt.legend()
-    # plt.show()
-
-    plt.savefig(saved_path + saved_file, dpi=300)
+def load_prediction(prediction_json):
+    with open(prediction_json) as f:
+        data = json.load(f)
+    return data
 
 
-# removes flagged season for one-season-out cross validation
-def remove_season(dataset_json_original, season_flag):
-    dataset_json = dataset_json_original.copy()
-    if season_flag < 1 or season_flag > 15:
-        raise ValueError('Season Not Available')
-    series_dict_accumulated = DataFrameUtils().accumulated_series_dict()
-    prev_index = series_dict_accumulated[season_flag-1] * ITEM_NUM
-    cur_index = series_dict_accumulated[season_flag] * ITEM_NUM
-    val_json = dataset_json_original[prev_index:cur_index]
-    del dataset_json[prev_index:cur_index]
-    return dataset_json, val_json
-
-
-def create_dataset_json(path, dataset_json_original, num_seasons=15):
-    if not os.path.exists(path):
-        os.makedirs(path)
-    if num_seasons < 1 or num_seasons > 15:
-        raise ValueError('Season Not Available')
-    for season in range(1, num_seasons+1):
-        train_lst, val_lst = remove_season(dataset_json_original, season)
-        # # save train dataset as jsonl
-        with open(path + '/' + 'onlyconnect_triplet_train_season_' + str(season) + '.jsonl', 'w') as outfile:
-            for entry in train_lst:
-                json.dump(entry, outfile)
-                outfile.write('\n')
-        outfile.close()
-        # # save validation dataset as jsonl
-        with open(path + '/' + 'onlyconnect_triplet_val_season_' + str(season) + '.jsonl', 'w') as outfile:
-            for entry in val_lst:
-                json.dump(entry, outfile)
-                outfile.write('\n')
-        outfile.close()
-        print("json datasets successfully created!")
-
-### functions related to GPT model ###
-def get_completion(wall1, model="gpt-4"):
-    completion = openai.ChatCompletion.create(
-    model=model,
-    # max_tokens=125,
-    messages=[{"role": "assistant", "content": "for each group describe the relationship in first line and group four words in second single line separated by comma without any further explanation. only write the given words in the second line."},
-              {"role": "user", "content": "group the following words into 4 groups of related 4: " + wall1}],
-                 temperature=0)
-    return completion.choices[0].message.content
-
-def examine_wall_gpt(gpt_content, wall1_default):
-    GROUP_WORDS = 4
-    ITEM_NUM = 16
-    reply_content = gpt_content
-    lst_words = []
+def get_clusters(clf_embeds_final, wall_1):
+    lst_words = wall_1['words']
     lst_groups = []
-    flag = False
-
-    if '- ' in gpt_content or ' -' in gpt_content:
-        flag = True
-        reply_content = reply_content.replace('- ', '')
-    reply = reply_content.split('\n\n')
     for i in range(4):
-        replay_split = reply[i].split('\n')
-        if flag:
-            lst_words += replay_split[1:]
-        else:
-            lst_words += replay_split[1].split(', ')
-        lst_groups += re.findall(r'(?<=: )(.*)', replay_split[0])*4
+        lst_groups.append([])
+    for i in range(len(clf_embeds_final)):
+        lst_groups[clf_embeds_final[i]].append(lst_words[i])
+    return lst_groups
 
-    lst_words_default = wall1_default
-    correct_groups = 0
-    for i in range(GROUP_WORDS, ITEM_NUM+1, GROUP_WORDS):
-        for j in range(GROUP_WORDS, ITEM_NUM+1, GROUP_WORDS):
-            if sorted(lst_words[i-GROUP_WORDS:i]) == sorted(lst_words_default[j-GROUP_WORDS:j]):
-                correct_groups += 1
-                # print(lst_words[i-GROUP_WORDS:i])
-    return correct_groups, lst_words, lst_groups
 
-def word2index(lst_words, wall1_default):
+def clue2group(lst_words, wall1_default):
     dict_bbb = {}
     lst_aaa_new = []
     lst_default = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
@@ -350,24 +190,20 @@ def word2index(lst_words, wall1_default):
     lst_words_new = lst_words.copy()
     for i in lst_words_new:
         lst_words_new[lst_words_new.index(i)] = dict_bbb[i]
-    return lst_words_new, lst_default
+    return lst_words_new
 
-def wall_evaluator_gpt(num_default=0, wall_skip=0):
-    df_new = DataFrameUtils().preprocess_text()
-    wall_info = {}
-    num = (num_default * EPISODE_ITEMS) + (wall_skip * WALL_ITEMS)
-    wall1_default = df_new[int(num - WALL_ITEMS):int(num)]['Names'].tolist()
-    wall_info['names'] = wall1_default
-    wall1_shuffled = wall1_default.copy()
-    random.shuffle(wall1_shuffled)
-    wall1 = " ".join(wall1_shuffled)
-    gpt_content = get_completion(wall1).lower()
-    correct_groups, lst_words, lst_groups = examine_wall_gpt(gpt_content, wall1_default)
-    lst_words_new, lst_default = word2index(lst_words, wall1_default)
-    clf_embeds_metrics = wall_evaluation(label=lst_words_new, label_true=lst_default)
-    wall_info['correct_groups'] = correct_groups
-    wall_info['predicted_relationships'] = lst_groups
-    wall_info['predicted_groups'] = lst_words
-    wall_info['scores'] = clf_embeds_metrics
 
-    return wall_info
+# find wall in prediction files based on wall unique id
+def find_wall(wall_id, preds):
+    for i in preds:
+        if i['wall_id'] == wall_id:
+            return i['predicted_groups']
+
+
+# check number of matches in two lists
+def check_equal(lst1, lst2):
+    count = 0
+    for i in lst1:
+        if i in lst2:
+            count += 1
+    return count
