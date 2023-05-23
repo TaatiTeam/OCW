@@ -68,4 +68,4 @@ class Evaluate:
 
 if __name__ == '__main__':
     args = get_args()
-    Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.seed).task1_evaluation()
+    Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.split, args.seed).task1_evaluation()
