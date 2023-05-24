@@ -101,7 +101,11 @@ class Evaluate:
                 for pred, gt in zip(pred_connections, gt_connections)
             ]
             bert_score_results = bertscore.compute(
-                predictions=pred_connections, references=gt_connections, lang="en", use_fast_tokenizer=True
+                predictions=pred_connections,
+                references=gt_connections,
+                lang="en",
+                rescale_with_baseline=True,
+                use_fast_tokenizer=True,
             )
             self.EXACT_MATCH.append(np.mean(exact_match_results))
             self.ROUGE.append(np.mean(rouge_results))
