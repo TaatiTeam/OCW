@@ -195,9 +195,9 @@ def clue2group(lst_words, wall1_default):
 
 # find wall in prediction files based on wall unique id
 def find_wall(wall_id, preds):
-    for i in preds:
-        if i['wall_id'] == wall_id:
-            return i['predicted_groups']
+    for wall in preds:
+        if wall['wall_id'] == wall_id:
+            return wall
 
 
 # check number of matches in two lists

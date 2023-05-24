@@ -3,7 +3,7 @@ from flair.embeddings import TransformerWordEmbeddings
 from utils import *
 import warnings
 from tqdm.auto import tqdm
-from evaluate import Evaluate
+from evaluate_only_connect import Evaluate
 from arguments import get_args
 
 class ModelPrediction:
