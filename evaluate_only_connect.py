@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 from sklearn.metrics import normalized_mutual_info_score as nmi
-from sklearn.metrics.cluster import adjusted_rand_score as ari
+from scipy.stats import wasserstein_distance as wd
 from tqdm.auto import tqdm
 
 import utils
@@ -20,7 +20,7 @@ class Evaluate:
         self.seed = seed
 
         # Task 1 metrics
-        self.ARI = []
+        self.WD = []
         self.NMI = []
         self.FULL_WALL = 0
         self.CORRECT_GROUPS = 0
@@ -49,22 +49,20 @@ class Evaluate:
             pred_lst = [item for sublist in pred_sorted for item in sublist]
             index_gt = utils.clue2group(gt_lst, gt_lst)
             index_pred = utils.clue2group(pred_lst, gt_lst)
-            ari_val = ari(index_pred, index_gt)
-            if ari_val < 0:
-                ari_val = 0
+            wd_val = wd(index_pred, index_gt)
             nmi_val = nmi(index_pred, index_gt)
-            self.ARI.append(ari_val)
+            self.WD.append(wd_val)
             self.NMI.append(nmi_val)
             oc_eval_results["granular"].append(
                 {
                     "wall_id": wall["wall_id"],
-                    "ARI": ari_val,
+                    "WD": wd_val,
                     "NMI": nmi_val,
                     "correct_groups": correct_groups,
                     "full_wall": correct_groups == 4,
                 }
             )
-        oc_eval_results["global"]["ARI"] = np.mean(self.ARI)
+        oc_eval_results["global"]["WD"] = np.mean(self.WD)
         oc_eval_results["global"]["NMI"] = np.mean(self.NMI)
         oc_eval_results["global"]["full_wall"] = self.FULL_WALL
         oc_eval_results["global"]["correct_groups"] = self.CORRECT_GROUPS

@@ -3,14 +3,15 @@ from flair.embeddings import TransformerWordEmbeddings
 from utils import *
 import warnings
 from tqdm.auto import tqdm
-from evaluate_only_connect import Evaluate
+from evaluate import Evaluate
 from arguments import get_args
 
 class ModelPrediction:
-    def __init__(self, model_name='elmo', dataset_path='./', predictions_path='./predictions/', seed=42):
+    def __init__(self, model_name='elmo', dataset_path='./', predictions_path='./predictions/', split="test", seed=42):
         self.model_name = model_name
         self.dataset_path = dataset_path
         self.predictions_path = predictions_path
+        self.split = split
         self.seed = seed
 
     def prediction(self):
@@ -29,9 +30,7 @@ class ModelPrediction:
             except:
                 raise Exception('Model is not supported')
 
-        for wall in tqdm(dataset['test']):
-            # print('Season: {}, Episode: {}, ID: {}'.format(wall['season'], wall['episode'], wall['wall_id']))
-            # try:
+        for wall in tqdm(dataset[self.split]):
             # step 1 => get model's contextual embeddings
             wall_embed = get_embeddings(spare_model, wall['words'])
             # step 2 => perform constrained clustering
@@ -53,6 +52,6 @@ class ModelPrediction:
 if __name__ == '__main__':
     args = get_args()
     # the model_name should be from huggingface model hub
-    ModelPrediction(args.model_name, args.dataset_path, args.predictions_path, args.seed).prediction()
+    ModelPrediction(args.model_name, args.dataset_path, args.predictions_path, args.split, args.seed).prediction()
     Evaluate(args.predictions_path + args.model_name.replace('/', '-') + '_predictions.json'
-             , args.dataset_path, args.results_path, args.seed).task1_evaluation()
+             , args.dataset_path, args.results_path, args.split, args.seed).task1_evaluation()
