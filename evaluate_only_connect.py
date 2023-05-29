@@ -90,6 +90,9 @@ class Evaluate:
         for wall in tqdm(dataset[self.split]):
             gt_connections = wall["gt_connections"]
             pred_connections = utils.find_wall(wall["wall_id"], prediction)["predicted_connections"]
+            # Lowercase and strip so results are invariant to trailing whitespace and capitalization
+            gt_connections = [connection.lower().strip() for connection in gt_connections]
+            pred_connections = [connection.lower().strip() for connection in pred_connections]
             exact_match_results = [
                 exact_match.compute(predictions=[pred], references=[gt])["exact_match"]
                 for pred, gt in zip(pred_connections, gt_connections)
