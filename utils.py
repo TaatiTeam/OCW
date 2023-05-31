@@ -152,15 +152,15 @@ def plot_wall(model_name, embeddings, wall, clusteringOutput, dim_reduction='pca
     # centroids = clf.cluster_centers_
     colors = ['purple', 'green', 'red', 'blue']
     font = {'family': 'Times New Roman',
-            'size': 7}
+            'size': 6}
 
     plt.rc('font', **font)
-    plt.figure(figsize=(7, 4))
+    plt.figure(figsize=(4, 4))
     # plotting the results:
     j = 0
     for i in U_LABEL_TRUE:
         plt.scatter(reduction[LABEL_TRUE == i, 0], reduction[LABEL_TRUE == i, 1],
-                    label='Group ' + str(i + 1) + ': ' + connections[i], s=100,
+                    label='Group ' + str(i + 1) + ': ' + connections[i], s=20,
                     color=colors[i])
     for name, x, y in zip(emmbedes_lst, reduction[:, 0], reduction[:, 1]):
         plt.annotate(name, xy=(x, y), xytext=(-7, 5), textcoords='offset points')
@@ -187,13 +187,13 @@ def plot_wall(model_name, embeddings, wall, clusteringOutput, dim_reduction='pca
         dist_along = np.concatenate(([0], dist.cumsum()))
         spline, u = interpolate.splprep([x_hull, y_hull],
                                         u=dist_along, s=0)
-        interp_d = np.linspace(dist_along[0], dist_along[-1], 50)
+        interp_d = np.linspace(dist_along[0], dist_along[-1], 100)
         interp_x, interp_y = interpolate.splev(interp_d, spline)
         # plot shape
         plt.fill(interp_x, interp_y, '--', c='gainsboro', alpha=0.1)
 
     # plt.grid(b=None)
-    plt.legend(loc='upper center')
+    plt.legend(loc='best')
     # plt.show()
 #
     plt.savefig(save_path + saved_file, dpi=300)
