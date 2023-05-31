@@ -185,19 +185,25 @@ def clue2group(lst_words, wall1_default):
     dict_bbb = {}
     lst_aaa_new = []
     lst_default = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+    lst_replaced = [i for i in range (4, 20)]
     for i in range(len(wall1_default)):
         dict_bbb[wall1_default[i]] = lst_default[i]
     lst_words_new = lst_words.copy()
+    # if len(set(lst_words_new)) != len(set(wall1_default)):
+    #     return lst_replaced
     for i in lst_words_new:
-        lst_words_new[lst_words_new.index(i)] = dict_bbb[i]
+        if i in dict_bbb.keys():
+            lst_words_new[lst_words_new.index(i)] = dict_bbb[i]
+        else:
+            lst_words_new[lst_words_new.index(i)] = lst_replaced.pop(0)
     return lst_words_new
 
 
 # find wall in prediction files based on wall unique id
 def find_wall(wall_id, preds):
-    for wall in preds:
-        if wall['wall_id'] == wall_id:
-            return wall
+    for i in preds:
+        if i['wall_id'] == wall_id:
+            return i
 
 
 # check number of matches in two lists

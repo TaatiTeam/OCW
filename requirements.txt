@@ -163,3 +163,7 @@ sentence-transformers==2.2.2
 tokenizers==0.13.2
 tqdm==4.49.0
 transformers==4.26.1
+
+evaluate
+rouge-score
+bert-score
