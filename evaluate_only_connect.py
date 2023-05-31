@@ -10,7 +10,6 @@ import utils
 from arguments import get_args
 from evaluate import load
 
-
 class Evaluate:
     def __init__(self, prediction_file, dataset_path="./", results_path="./results", split="test", seed=42):
         self.prediction_json = prediction_file
@@ -19,17 +18,17 @@ class Evaluate:
         self.split = split
         self.seed = seed
 
-        # Task 1 metrics
+        # Task 1 - grouping metrics
         self.WD = []
         self.NMI = []
         self.FULL_WALL = 0
         self.CORRECT_GROUPS = 0
-        # Task 2 metrics
+        # Task 2 - connections metrics
         self.EXACT_MATCH = []
         self.ROUGE = []
         self.BERT_SCORE = []
 
-    def task1_evaluation(self):
+    def task1_grouping_evaluation(self):
         utils.set_seed(seed=self.seed)
         oc_eval_results = {"global": {}, "granular": []}
         if not os.path.exists(self.dataset_path):
@@ -39,8 +38,8 @@ class Evaluate:
         for wall in tqdm(dataset[self.split]):
             gt_words = [i["gt_words"] for i in wall["groups"].values()]
             pred_words = utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
-            gt_sorted = [sorted(i) for i in gt_words]
-            pred_sorted = [sorted(i) for i in pred_words]
+            gt_sorted = [sorted(utils.lower_case(i)) for i in gt_words]
+            pred_sorted = [sorted(utils.lower_case(i)) for i in pred_words]
             correct_groups = utils.check_equal(pred_sorted, gt_sorted)
             self.CORRECT_GROUPS += correct_groups
             if correct_groups == 4:
@@ -49,14 +48,21 @@ class Evaluate:
             pred_lst = [item for sublist in pred_sorted for item in sublist]
             index_gt = utils.clue2group(gt_lst, gt_lst)
             index_pred = utils.clue2group(pred_lst, gt_lst)
-            wd_val = wd(index_pred, index_gt)
             nmi_val = nmi(index_pred, index_gt)
-            self.WD.append(wd_val)
+            pred_sliced = utils.slice_list(index_pred, 4)
+            gt_sliced = utils.slice_list(index_gt, 4)
+            wd_val = 0
+            pred_sliced, gt_sliced = utils.remove_same(pred_sliced, gt_sliced)
+            for i in range(len(pred_sliced)):
+                wd_val += min(wd(pred_sliced[i], gt_sliced[i]), 1)
+
+            # normalize wd to be in [0, 1]
+            self.WD.append(wd_val/4)
             self.NMI.append(nmi_val)
             oc_eval_results["granular"].append(
                 {
                     "wall_id": wall["wall_id"],
-                    "WD": wd_val,
+                    "WD": wd_val/4,
                     "NMI": nmi_val,
                     "correct_groups": correct_groups,
                     "full_wall": correct_groups == 4,
@@ -77,7 +83,7 @@ class Evaluate:
 
         print("results saved to: ", self.results_path)
 
-    def task2_evaluation(self):
+    def task2_connections_evaluation(self):
         utils.set_seed(seed=self.seed)
         exact_match = load("exact_match")
         rouge = load("rouge")
@@ -90,6 +96,9 @@ class Evaluate:
         for wall in tqdm(dataset[self.split]):
             gt_connections = wall["gt_connections"]
             pred_connections = utils.find_wall(wall["wall_id"], prediction)["predicted_connections"]
+            # Lowercase and strip so results are invariant to trailing whitespace and capitalization
+            gt_connections = [connection.lower().strip() for connection in gt_connections]
+            pred_connections = [connection.lower().strip() for connection in pred_connections]
             exact_match_results = [
                 exact_match.compute(predictions=[pred], references=[gt])["exact_match"]
                 for pred, gt in zip(pred_connections, gt_connections)
@@ -120,19 +129,17 @@ class Evaluate:
         oc_eval_results["global"]["exact_match"] = np.mean(self.EXACT_MATCH)
         oc_eval_results["global"]["rouge1_f1"] = np.mean(self.ROUGE)
         oc_eval_results["global"]["bert_score_f1"] = np.mean(self.BERT_SCORE)
-
         # save results as json
         if not os.path.exists(self.results_path):
             os.makedirs(self.results_path)
         with open(
-            self.results_path + "/" + self.prediction_json.split("_")[0].split("/")[-1] + "_results.json", "w"
+                self.results_path + "/" + self.prediction_json.split("_")[0].split("/")[-1] + "_results.json", "w"
         ) as f:
             json.dump(oc_eval_results, f, indent=2)
-
         print("results saved to: ", self.results_path)
 
 
 if __name__ == "__main__":
     args = get_args()
     evaluator = Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.split, args.seed)
-    evaluator.task1_evaluation() if args.task == "task1" else evaluator.task2_evaluation()
+    evaluator.task1_grouping_evaluation() if args.task == "task1-grouping" else evaluator.task2_connections_evaluation()
