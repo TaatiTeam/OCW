@@ -15,6 +15,11 @@ import re
 import numpy as np
 import json
 
+import nltk
+from nltk.corpus import stopwords
+
+nltk.download('stopwords')
+
 # add your OpenAI API key
 # openai.api_key = open("key.txt", "r").read().strip('\n')
 
@@ -26,6 +31,37 @@ def get_embeddings(embeddings, sentence):
         [token.embedding for token in sent.tokens]
     ).float()
 
+# function to get Glove embeddings
+def get_embeddings_glove(embeddings, sentence):
+    return torch.stack(
+            [torch.as_tensor(embeddings.encode(token)) for token in sentence]
+        ).float()
+
+# function to get Word2Vec embeddings
+def get_embeddings_wv(embeddings, sentence):
+    lst_embed = []
+    cnt_zero = 0
+    for token in sentence:
+        lst_sub_embed = []
+        lst_add = 0
+        try:
+            lst_embed.append(torch.as_tensor(embeddings[token]))
+        except:
+            cnt_zero += 1
+            if len(token.split(' ')) > 1:
+                token = [i for i in token.split(' ') if i not in stopwords.words('english')]
+                for tokens in token:
+                    try:
+                        lst_sub_embed.append(embeddings[tokens])
+                    except:
+                        lst_sub_embed.append(np.zeros(300))
+                for i in lst_sub_embed:
+                    lst_add += i
+                    lst_add = lst_add/len(lst_sub_embed)
+                lst_embed.append(torch.as_tensor(lst_add))
+            else:
+                lst_embed.append(torch.zeros(300))
+    return torch.stack(lst_embed).float(), cnt_zero
 
 # set seeds
 def set_seed(seed=42):
@@ -91,71 +127,76 @@ def load_clf(seed=42):
         random_state=seed)
     return clf
 
-# def plot_solved_wall(embeddings, wall_skip, wall1_default, wall_info, dim_reduction='tsne', saved_path=None):
-#     if not saved_path:
-#         saved_path = './nlp_plots/'
-#         saved_file = 'wall' + str(wall1_default) + str(wall_skip) + '_' + dim_reduction + '.jpg'
-#     if not os.path.isdir(saved_path):
-#         os.mkdir(saved_path)
-#     if dim_reduction == 'tsne':
-#         df_tsne = load_tsne().fit_transform(embeddings.cpu())
-#     elif dim_reduction == 'pca':
-#         df_tsne = load_pca().fit_transform(embeddings.cpu())
-#     elif dim_reduction == 'kernel_pca':
-#         df_tsne = load_kpca().fit_transform(embeddings.cpu())
-#     else:
-#         raise ValueError('No Valid Dimentionality Reduction Was Found')
+def plot_wall(model_name, embeddings, wall, clusteringOutput, dim_reduction='pca', save_path='./plots/'):
+    saved_file = 'model_' + model_name.replace('/', '-') + '_wall_' + wall['wall_id'] + '_' + dim_reduction + '.jpg'
+    if not os.path.isdir(save_path):
+        os.mkdir(save_path)
+    if dim_reduction == 'tsne':
+        reduction = load_tsne().fit_transform(embeddings.cpu())
+    elif dim_reduction == 'pca':
+        reduction = load_pca(n_components=2).fit_transform(embeddings.cpu())
+    elif dim_reduction == 'kernel_pca':
+        reduction = load_kpca().fit_transform(embeddings.cpu())
+    else:
+        raise ValueError('No Valid Dimentionality Reduction Was Found')
+
+    # label = load_clf().fit_predict(reduction)
+    label = clusteringOutput
+    # Getting unique labels
+    wall1_default = wall['groups']['group_1']['gt_words'] + wall['groups']['group_2']['gt_words']\
+                    + wall['groups']['group_3']['gt_words'] + wall['groups']['group_4']['gt_words']
+    connections = wall['gt_connections']
+    emmbedes_lst = wall['words']
+    LABEL_TRUE = clue2group(emmbedes_lst, wall1_default)
+    U_LABEL_TRUE = np.unique(LABEL_TRUE)
+    # centroids = clf.cluster_centers_
+    colors = ['purple', 'green', 'red', 'blue']
+    font = {'family': 'Times New Roman',
+            'size': 6}
+
+    plt.rc('font', **font)
+    plt.figure(figsize=(4, 4))
+    # plotting the results:
+    j = 0
+    for i in U_LABEL_TRUE:
+        plt.scatter(reduction[LABEL_TRUE == i, 0], reduction[LABEL_TRUE == i, 1],
+                    label='Group ' + str(i + 1) + ': ' + connections[i], s=20,
+                    color=colors[i])
+    for name, x, y in zip(emmbedes_lst, reduction[:, 0], reduction[:, 1]):
+        plt.annotate(name, xy=(x, y), xytext=(-7, 5), textcoords='offset points')
+
+    # Plot the centroids as a black X
+    # plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', color='k')
+
+    # draw enclosure
+    for i in label:
+        points = reduction[label == i]
+        # get convex hull
+        hull = ConvexHull(points)
+        # get x and y coordinates
+        # repeat last point to close the polygon
+        x_hull = np.append(points[hull.vertices, 0],
+                           points[hull.vertices, 0][0])
+        y_hull = np.append(points[hull.vertices, 1],
+                           points[hull.vertices, 1][0])
+        # # plot shape
+        # plt.fill(x_hull, y_hull, alpha=0.3, c='gainsboro')
+
+        # interpolate
+        dist = np.sqrt((x_hull[:-1] - x_hull[1:]) ** 2 + (y_hull[:-1] - y_hull[1:]) ** 2)
+        dist_along = np.concatenate(([0], dist.cumsum()))
+        spline, u = interpolate.splprep([x_hull, y_hull],
+                                        u=dist_along, s=0)
+        interp_d = np.linspace(dist_along[0], dist_along[-1], 100)
+        interp_x, interp_y = interpolate.splev(interp_d, spline)
+        # plot shape
+        plt.fill(interp_x, interp_y, '--', c='gainsboro', alpha=0.1)
+
+    # plt.grid(b=None)
+    plt.legend(loc='best')
+    # plt.show()
 #
-#     wall_info = wall_evaluator(wall_skip=wall_skip, embeddings=embeddings, dim_reduction=dim_reduction, seed=42)
-#     label = wall_info['clf_embeds'][0]
-#
-#     # Getting unique labels
-#     u_labels = np.unique(label)
-#
-#     emmbedes_lst = wall1_default
-#     # centroids = clf.cluster_centers_
-#     colors = ['purple', 'green', 'red', 'blue']
-#     plt.figure(figsize=(14, 8))
-#     # plotting the results:
-#     j = 0
-#     for i in U_LABEL_TRUE:
-#         plt.scatter(df_tsne[LABEL_TRUE == i, 0], df_tsne[LABEL_TRUE == i, 1], label='Group ' + str(i + 1), s=100,
-#                     color=colors[i])
-#     for name, x, y in zip(emmbedes_lst, df_tsne[:, 0], df_tsne[:, 1]):
-#         plt.annotate(name, xy=(x, y), xytext=(-15, 10), textcoords='offset points')
-#
-#     # Plot the centroids as a black X
-#     # plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', color='k')
-#
-#     # draw enclosure
-#     for i in label:
-#         points = df_tsne[label == i]
-#         # get convex hull
-#         hull = ConvexHull(points)
-#         # get x and y coordinates
-#         # repeat last point to close the polygon
-#         x_hull = np.append(points[hull.vertices, 0],
-#                            points[hull.vertices, 0][0])
-#         y_hull = np.append(points[hull.vertices, 1],
-#                            points[hull.vertices, 1][0])
-#         # # plot shape
-#         # plt.fill(x_hull, y_hull, alpha=0.3, c='gainsboro')
-#
-#         # interpolate
-#         dist = np.sqrt((x_hull[:-1] - x_hull[1:]) ** 2 + (y_hull[:-1] - y_hull[1:]) ** 2)
-#         dist_along = np.concatenate(([0], dist.cumsum()))
-#         spline, u = interpolate.splprep([x_hull, y_hull],
-#                                         u=dist_along, s=0)
-#         interp_d = np.linspace(dist_along[0], dist_along[-1], 50)
-#         interp_x, interp_y = interpolate.splev(interp_d, spline)
-#         # plot shape
-#         plt.fill(interp_x, interp_y, '--', c='gainsboro', alpha=0.1)
-#
-#     plt.grid(b=None)
-#     plt.legend()
-#     # plt.show()
-#
-#     plt.savefig(saved_path + saved_file, dpi=300)
+    plt.savefig(save_path + saved_file, dpi=300)
 
 ### functions useful for new script and dataset ###
 def load_hf_dataset(dataset_path):
@@ -213,3 +254,25 @@ def check_equal(lst1, lst2):
         if i in lst2:
             count += 1
     return count
+
+# slice a list into n equal sublists
+def slice_list(lst, n):
+    return [lst[i:i+n] for i in range(0, n*n, n)]
+
+# remove same items from two lists
+def remove_same(lst1, lst2):
+    lst1_new = lst1.copy()
+    lst2_new = lst2.copy()
+    for i in lst1:
+        if i in lst2:
+            lst1_new.remove(i)
+            lst2_new.remove(i)
+    return lst1_new, lst2_new
+
+# lower case a list of words
+def lower_case(lst):
+    lst_new = []
+    for i in lst:
+        lst_new.append(i.lower())
+    return lst_new
+
