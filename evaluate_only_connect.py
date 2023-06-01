@@ -36,7 +36,7 @@ class Evaluate:
         dataset = utils.load_hf_dataset(self.dataset_path)
         prediction = utils.load_prediction(self.prediction_json)
         for wall in tqdm(dataset[self.split]):
-            gt_words = [i["gt_groups"] for i in wall["groups"].values()]
+            gt_words = [i["gt_words"] for i in wall["groups"].values()]
             pred_words = utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
             gt_sorted = [sorted(utils.lower_case(i)) for i in gt_words]
             pred_sorted = [sorted(utils.lower_case(i)) for i in pred_words]
