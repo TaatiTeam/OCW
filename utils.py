@@ -145,8 +145,8 @@ def plot_wall(model_name, embeddings, wall, clusteringOutput, dim_reduction='pca
     # label = load_clf().fit_predict(reduction)
     label = clusteringOutput
     # Getting unique labels
-    wall1_default = wall['groups']['group_1']['gt_groups'] + wall['groups']['group_2']['gt_groups']\
-                    + wall['groups']['group_3']['gt_groups'] + wall['groups']['group_4']['gt_groups']
+    wall1_default = wall['groups']['group_1']['gt_words'] + wall['groups']['group_2']['gt_words']\
+                    + wall['groups']['group_3']['gt_words'] + wall['groups']['group_4']['gt_words']
     connections = wall['gt_connections']
     emmbedes_lst = wall['words']
     LABEL_TRUE = clue2group(emmbedes_lst, wall1_default)
