@@ -16,6 +16,8 @@ import numpy as np
 import json
 from transformers import enable_full_determinism
 
+from typing import List
+
 # add your OpenAI API key
 # openai.api_key = open("key.txt", "r").read().strip('\n')
 
@@ -224,11 +226,20 @@ def find_wall(wall_id, preds):
 
 
 # check number of matches in two lists
-def check_equal(lst1, lst2):
+def check_equal(gt_groups:List, pred_groups: List):
     count = 0
-    for i in lst1:
-        if i in lst2:
+    for i in gt_groups:
+        if i in pred_groups:
             count += 1
+    return count
+
+def get_number_of_solved_groups(gt_groups:List, pred_groups:List, debug=False):
+    count = 0
+    for y in gt_groups:
+        matches = list(map(lambda y_hat_i: set(y).intersection(y_hat_i), pred_groups))
+        if any([len(x) == 4 for x in matches]):
+            count += 1
+            if debug: print(f"Matches for {y} = {matches}")
     return count
 
 # slice a list into n equal sublists

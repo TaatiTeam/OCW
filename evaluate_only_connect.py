@@ -46,7 +46,7 @@ class Evaluate:
             pred_words = utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
             gt_sorted = [sorted(utils.lower_case(i)) for i in gt_words]
             pred_sorted = [sorted(utils.lower_case(i)) for i in pred_words]
-            correct_groups = utils.check_equal(pred_sorted, gt_sorted)
+            correct_groups = utils.check_equal(gt_sorted, pred_sorted)
             self.CORRECT_GROUPS += correct_groups
             if correct_groups == 4:
                 self.FULL_WALL += 1
