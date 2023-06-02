@@ -1,78 +1,109 @@
-from flair.embeddings import ELMoEmbeddings
-from flair.embeddings import TransformerWordEmbeddings
+from flair.embeddings import ELMoEmbeddings, FastTextEmbeddings, \
+    WordEmbeddings, TransformerWordEmbeddings, TransformerDocumentEmbeddings, BytePairEmbeddings, StackedEmbeddings
 from utils import *
-import warnings
 from tqdm.auto import tqdm
 from evaluate_only_connect import Evaluate
 from arguments import get_args
-from sentence_transformers import SentenceTransformer
-import gensim.downloader
+import random
+
 
 class ModelPrediction:
-    def __init__(self, model_name='elmo', dataset_path='./',
-                 predictions_path='./predictions/task1/', split="test", plot='none', seed=42):
+    def __init__(self, contextual=False, model_name='elmo', dataset_path='./',
+                 predictions_path='./predictions/task1/', split="test", plot='none', dim_reduction='tsne', seed=42):
+        self.contextual = contextual
         self.model_name = model_name
         self.dataset_path = dataset_path
         self.predictions_path = predictions_path
         self.split = split
         self.plot = plot
+        self.dim_reduction = dim_reduction
         self.seed = seed
+        self.DATASET = load_hf_dataset(self.dataset_path)
 
-    def prediction(self):
-        warnings.filterwarnings("ignore")
+    def load_model(self):
         set_seed(seed=self.seed)
         clf = load_clf(seed=self.seed)
-        if not os.path.exists(self.dataset_path):
-            raise Exception('Dataset path does not exist')
-        dataset = load_hf_dataset(self.dataset_path)
-        oc_results = []
-        if self.model_name == 'elmo':
-            spare_model = ELMoEmbeddings(embedding_mode='top')
-        elif self.model_name == 'glove':
-            spare_model = SentenceTransformer('sentence-transformers/average_word_embeddings_glove.840B.300d')
-        elif self.model_name == 'wv':
-            spare_model = gensim.downloader.load('word2vec-google-news-300')
-        else:
-            try:
-                spare_model = TransformerWordEmbeddings(self.model_name, layers='-1, -2, -3, -4')
-            except:
-                raise Exception('Model is not supported')
-        # cnt_wrd = 0
-        for wall in tqdm(dataset[self.split]):
-            # step 1 => get model's contextual embeddings
-            if self.model_name == 'glove':
-                wall_embed = get_embeddings_glove(spare_model, wall['words'])
-                # cnt_wrd += get_embeddings_glove(spare_model, wall['words'])[1]
-            elif self.model_name == 'wv':
-                wall_embed = get_embeddings_wv(spare_model, wall['words'])[0]
-                # cnt_wrd += get_embeddings_wv(spare_model, wall['words'])[1]
+        try:
+            if self.model_name == 'elmo':
+                spare_model = ELMoEmbeddings('large')
+            # elif self.model_name == 'glove':
+            #     spare_model = WordEmbeddings(self.model_name)
+            elif self.model_name in ['glove', 'crawl', 'news', 'en']:
+                # FastText Embeddings with oov functionality
+                spare_model = WordEmbeddings(self.model_name)
+                # spare_model = FastTextEmbeddings('/media/saboa/DATA/cc.en.300.bin')
             else:
-                wall_embed = get_embeddings(spare_model, lower_case(wall['words']))
+                if self.contextual:
+                    spare_model = TransformerWordEmbeddings(self.model_name)
+                else:
+                    spare_model = TransformerDocumentEmbeddings(self.model_name)
+        except:
+            raise Exception('Model is not supported')
+        return spare_model, clf
+
+
+    def prediction(self, spare_model, clf, shuffle_seed=None):
+        lst_oov = []
+        oc_results = []
+        for wall in tqdm(self.DATASET[self.split]):
+            if isinstance(shuffle_seed, int):
+                wall['words'] = random.Random(shuffle_seed).sample(wall['words'], len(wall['words']))
+            # step 1 => get model's contextual embeddings
+            if self.contextual or self.model_name in ['elmo', 'glove', 'crawl', 'news']:
+                wall_embed = get_embeddings(spare_model, wall['words'])
+                if self.model_name == 'elmo' and not self.contextual:
+                    # first 1024 embeddings of elmo are static
+                    wall_embed = wall_embed[:, :1024]
+            else:
+                wall_embed = get_embeddings_classic(spare_model, wall['words'])
+            # optional step: find number of oov words
+            # cnt_oov = 0
+            # for i in wall_embed:
+            #     if torch.count_nonzero(i) == 0:
+            #         cnt_oov += 1
+            # lst_oov.append(cnt_oov)
             # step 2 => perform constrained clustering
-            clf_embeds = clf.fit_predict(wall_embed.cpu())
+            clf_embeds = clf.fit_predict(wall_embed.detach().cpu())
             # Optional Step: plot the clusters
-            if self.plot == 'all':
-                plot_wall(self.model_name, wall_embed, wall, clf_embeds, dim_reduction='pca')
-            elif self.plot == wall['wall_id']:
-                plot_wall(self.model_name, wall_embed, wall, clf_embeds, dim_reduction='pca')
+            if self.plot == 'all' or self.plot == wall['wall_id']:
+                plot_wall(self.model_name, wall_embed, wall, clf_embeds, self.seed, dim_reduction=self.dim_reduction)
             # step 3 => get the clusters
-            predicted_groups = get_clusters(clf_embeds, wall)
+            predicted_groups = get_clusters(clf_embeds, wall['words'])
             wall_json = {'wall_id': wall['wall_id'], 'predicted_groups': predicted_groups}
             oc_results.append(wall_json)
-        # print('total words not in w2v: ', cnt_wrd)
-
+        # print('\n total oov words: {} out of {}'.format(sum(lst_oov), len(lst_oov)*16))
+        # print('\n')
+        # print(lst_oov)
         # save results as json
         if not os.path.exists(self.predictions_path):
             os.makedirs(self.predictions_path)
-        with open(self.predictions_path + '/' + self.model_name.replace('/', '-') + '_predictions.json', 'w') as f:
+        model_saved_name = self.model_name.replace('/', '-') + '-seed' + str(shuffle_seed) + '_predictions.json'
+        if self.contextual:
+            model_saved_name = model_saved_name.replace('-seed', '-contextual-seed')
+        with open(self.predictions_path + model_saved_name, 'w') as f:
             json.dump(oc_results, f)
+        print('\n predictions saved to: ', self.predictions_path)
 
-        print('predictions saved to: ', self.predictions_path)
-
+    def average_prediction(self, number_of_runs=16):
+        model_saved_name = self.model_name.replace('/', '-')
+        if self.contextual:
+            model_saved_name = model_saved_name + '-contextual'
+        self.predictions_path = self.predictions_path + model_saved_name + '/'
+        spare_model, clf = self.load_model()
+        for i in tqdm(range(number_of_runs)):
+            self.prediction(spare_model, clf, shuffle_seed=i)
 
 if __name__ == '__main__':
     args = get_args()
     # the model_name should be from huggingface model hub
-    ModelPrediction(args.model_name, args.dataset_path, args.predictions_path, args.split, args.plot, args.seed).prediction()
-    Evaluate(args.predictions_path + args.model_name.replace('/', '-') + '_predictions.json'
-             , args.dataset_path, args.results_path, args.split, args.seed).task1_grouping_evaluation()
+    # ModelPrediction(args.contextual, args.model_name, args.dataset_path, args.predictions_path,
+    #                 args.split, args.plot, args.dim_reduction, args.seed).prediction()
+    # Evaluate(args.predictions_path + args.model_name.replace('/', '-') + '_predictions.json'
+    #          , args.dataset_path, args.results_path, args.split, args.seed).task1_grouping_evaluation()
+    ModelPrediction(args.contextual, args.model_name, args.dataset_path, args.predictions_path,
+                    args.split, args.plot, args.dim_reduction, args.seed).average_prediction()
+    path = args.predictions_path + args.model_name.replace('/', '-')
+    if args.contextual:
+        path = path + '-contextual'
+    Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.split,
+             args.seed).task1_grouping_evaluation_batch(path)

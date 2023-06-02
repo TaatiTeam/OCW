@@ -1,6 +1,6 @@
 from datasets import load_dataset
 import matplotlib.pyplot as plt
-from flair.data import Sentence
+from flair.data import Sentence, Token
 import flair
 import torch
 from k_means_constrained import KMeansConstrained
@@ -14,16 +14,12 @@ import os
 import re
 import numpy as np
 import json
-
-import nltk
-from nltk.corpus import stopwords
-
-nltk.download('stopwords')
+from transformers import enable_full_determinism
 
 # add your OpenAI API key
 # openai.api_key = open("key.txt", "r").read().strip('\n')
 
-# function to get embeddings of a string from Flair Library
+# function to get contextual embeddings from Flair Library
 def get_embeddings(embeddings, sentence):
     sent = Sentence(sentence)
     embeddings.embed(sent)
@@ -31,37 +27,16 @@ def get_embeddings(embeddings, sentence):
         [token.embedding for token in sent.tokens]
     ).float()
 
-# function to get Glove embeddings
-def get_embeddings_glove(embeddings, sentence):
-    return torch.stack(
-            [torch.as_tensor(embeddings.encode(token)) for token in sentence]
-        ).float()
 
-# function to get Word2Vec embeddings
-def get_embeddings_wv(embeddings, sentence):
-    lst_embed = []
-    cnt_zero = 0
+
+# function to get classic embeddings from FLair Library
+def get_embeddings_classic(embeddings, sentence):
+    lst_embeddings = []
     for token in sentence:
-        lst_sub_embed = []
-        lst_add = 0
-        try:
-            lst_embed.append(torch.as_tensor(embeddings[token]))
-        except:
-            cnt_zero += 1
-            if len(token.split(' ')) > 1:
-                token = [i for i in token.split(' ') if i not in stopwords.words('english')]
-                for tokens in token:
-                    try:
-                        lst_sub_embed.append(embeddings[tokens])
-                    except:
-                        lst_sub_embed.append(np.zeros(300))
-                for i in lst_sub_embed:
-                    lst_add += i
-                    lst_add = lst_add/len(lst_sub_embed)
-                lst_embed.append(torch.as_tensor(lst_add))
-            else:
-                lst_embed.append(torch.zeros(300))
-    return torch.stack(lst_embed).float(), cnt_zero
+        sent = Sentence(token)
+        embeddings.embed(sent)
+        lst_embeddings.append(sent.embedding)
+    return torch.stack(lst_embeddings).float()
 
 # set seeds
 def set_seed(seed=42):
@@ -71,6 +46,7 @@ def set_seed(seed=42):
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     flair.set_seed(seed)
+    enable_full_determinism(seed=seed)
 
 
 # construct similarity matrix
@@ -127,16 +103,16 @@ def load_clf(seed=42):
         random_state=seed)
     return clf
 
-def plot_wall(model_name, embeddings, wall, clusteringOutput, dim_reduction='pca', save_path='./plots/'):
+def plot_wall(model_name, embeddings, wall, clusteringOutput, seed=42, dim_reduction='pca', save_path='./plots/'):
     saved_file = 'model_' + model_name.replace('/', '-') + '_wall_' + wall['wall_id'] + '_' + dim_reduction + '.jpg'
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
     if dim_reduction == 'tsne':
-        reduction = load_tsne().fit_transform(embeddings.cpu())
+        reduction = load_tsne(seed=seed).fit_transform(embeddings.cpu())
     elif dim_reduction == 'pca':
-        reduction = load_pca(n_components=2).fit_transform(embeddings.cpu())
+        reduction = load_pca(seed=seed).fit_transform(embeddings.cpu())
     elif dim_reduction == 'kernel_pca':
-        reduction = load_kpca().fit_transform(embeddings.cpu())
+        reduction = load_kpca(seed=seed).fit_transform(embeddings.cpu())
     else:
         raise ValueError('No Valid Dimentionality Reduction Was Found')
 
@@ -213,7 +189,7 @@ def load_prediction(prediction_json):
 
 
 def get_clusters(clf_embeds_final, wall_1):
-    lst_words = wall_1['words']
+    lst_words = wall_1
     lst_groups = []
     for i in range(4):
         lst_groups.append([])
