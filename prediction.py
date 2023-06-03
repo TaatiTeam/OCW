@@ -1,5 +1,6 @@
-from flair.embeddings import ELMoEmbeddings, FastTextEmbeddings, \
-    WordEmbeddings, TransformerWordEmbeddings, TransformerDocumentEmbeddings, BytePairEmbeddings, StackedEmbeddings
+from flair.embeddings import ELMoEmbeddings, WordEmbeddings, BytePairEmbeddings, \
+    StackedEmbeddings, TransformerWordEmbeddings, TransformerDocumentEmbeddings
+from sentence_transformers import SentenceTransformer
 from utils import *
 from tqdm.auto import tqdm
 from evaluate_only_connect import Evaluate
@@ -28,10 +29,15 @@ class ModelPrediction:
                 spare_model = ELMoEmbeddings('large')
             # elif self.model_name == 'glove':
             #     spare_model = WordEmbeddings(self.model_name)
-            elif self.model_name in ['glove', 'crawl', 'news', 'en']:
-                # FastText Embeddings with oov functionality
-                spare_model = WordEmbeddings(self.model_name)
-                # spare_model = FastTextEmbeddings('/media/saboa/DATA/cc.en.300.bin')
+            elif self.model_name in ['glove', 'crawl', 'news']:
+                spare_model = StackedEmbeddings(
+                                [
+                                    # standard FastText word embeddings for English
+                                    WordEmbeddings(self.model_name),
+                                    # Byte pair embeddings for English
+                                    BytePairEmbeddings('en'),
+                                ]
+                            )
             else:
                 if self.contextual:
                     spare_model = TransformerWordEmbeddings(self.model_name)
@@ -49,13 +55,15 @@ class ModelPrediction:
             if isinstance(shuffle_seed, int):
                 wall['words'] = random.Random(shuffle_seed).sample(wall['words'], len(wall['words']))
             # step 1 => get model's contextual embeddings
-            if self.contextual or self.model_name in ['elmo', 'glove', 'crawl', 'news']:
+            if self.contextual or self.model_name  == 'elmo':
                 wall_embed = get_embeddings(spare_model, wall['words'])
                 if self.model_name == 'elmo' and not self.contextual:
                     # first 1024 embeddings of elmo are static
                     wall_embed = wall_embed[:, :1024]
-            else:
+            elif self.model_name in ['glove', 'crawl', 'news']:
                 wall_embed = get_embeddings_classic(spare_model, wall['words'])
+            else:
+                wall_embed = get_embeddings_static(spare_model, wall['words'])
             # optional step: find number of oov words
             # cnt_oov = 0
             # for i in wall_embed:
@@ -95,11 +103,11 @@ class ModelPrediction:
 
 if __name__ == '__main__':
     args = get_args()
-    # the model_name should be from huggingface model hub
+    #### the model_name should be from huggingface model hub or in ['elmo', 'glove', 'crawl', 'news'] ###
     # ModelPrediction(args.contextual, args.model_name, args.dataset_path, args.predictions_path,
     #                 args.split, args.plot, args.dim_reduction, args.seed).prediction()
     # Evaluate(args.predictions_path + args.model_name.replace('/', '-') + '_predictions.json'
-    #          , args.dataset_path, args.results_path, args.split, args.seed).task1_grouping_evaluation()
+    #          , args.dataset_path, args.results_path, args.split, args.seed).task1_grouping_evaluation(shuffle_seed=0)
     ModelPrediction(args.contextual, args.model_name, args.dataset_path, args.predictions_path,
                     args.split, args.plot, args.dim_reduction, args.seed).average_prediction()
     path = args.predictions_path + args.model_name.replace('/', '-')
