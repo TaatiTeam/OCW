@@ -22,17 +22,19 @@ from typing import List
 # openai.api_key = open("key.txt", "r").read().strip('\n')
 
 # function to get contextual embeddings from Flair Library
-def get_embeddings(embeddings, sentence):
-    sent = Sentence(sentence)
+def get_embeddings(embeddings, sentences):
+    sentences_copy = lower_case(sentences.copy())
+    sent = Sentence(sentences_copy)
     embeddings.embed(sent)
     return torch.stack(
         [token.embedding for token in sent.tokens]
     ).float()
 
 # function to get classic embeddings from FLair Library
-def get_embeddings_static(embeddings, sentence):
+def get_embeddings_static(embeddings, sentences):
     lst_embeddings = []
-    for token in sentence:
+    sentences_copy = lower_case(sentences.copy())
+    for token in sentences_copy:
         sent = Sentence(token)
         embeddings.embed(sent)
         lst_embeddings.append(sent.embedding)

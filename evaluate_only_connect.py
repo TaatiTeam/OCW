@@ -13,8 +13,10 @@ from arguments import get_args
 from evaluate import load
 
 class Evaluate:
-    def __init__(self, prediction_file=None, dataset_path="./", results_path="./results/", split="test", seed=42):
+    def __init__(self, prediction_file=None, prediction_path=None, dataset_path="./",
+                 results_path="./results/", split="test", seed=42):
         self.prediction_file = prediction_file
+        self.prediction_path = prediction_path
         self.dataset_path = dataset_path
         self.results_path = results_path
         self.split = split
@@ -102,11 +104,18 @@ class Evaluate:
 
         print("results saved to: ", self.results_path)
 
-    def task1_grouping_evaluation_batch(self, predictions_path="./predictions/"):
-        json_files = [pos_json for pos_json in os.listdir(predictions_path) if pos_json.endswith("_predictions.json")]
-        self.results_path = self.results_path + predictions_path.split("/")[-1] + '/'
+    def task1_grouping_evaluation_batch(self):
+        json_files = [pos_json for pos_json in os.listdir(self.prediction_path) if pos_json.endswith("_predictions.json")]
+        self.results_path = self.results_path + self.prediction_path.split("/")[-1] + '/'
         for file in json_files:
-            self.prediction_file = predictions_path + '/' + file
+            self.prediction_file = self.prediction_path + '/' + file
+            self.WD = []
+            self.NMI = []
+            self.FULL_WALL = 0
+            self.CORRECT_GROUPS = 0
+            # Task 1 - additional metrics
+            self.FMS = []
+            self.ARI = []
             self.task1_grouping_evaluation()
         results_files = [pos_json for pos_json in os.listdir(self.results_path) if pos_json.endswith("_results.json")]
         results = {}
@@ -133,16 +142,20 @@ class Evaluate:
         results["std_wd"] = np.std(wd_list)
         results["mean_nmi"] = np.mean(nmi_list)
         results["std_nmi"] = np.std(nmi_list)
+        # results["nmi_list"] = nmi_list
         # additional metrics
         results["mean_ari"] = np.mean(ari_list)
         results["std_ari"] = np.std(ari_list)
+        # results["ari_list"] = ari_list
         results["mean_fms"] = np.mean(fms_list)
         results["std_fms"] = np.std(fms_list)
 
         results["mean_full_wall"] = np.mean(full_wall_list)
         results["std_full_wall"] = np.std(full_wall_list)
+        # results["full_wall_list"] = full_wall_list
         results["mean_correct_groups"] = np.mean(correct_groups_list)
         results["std_correct_groups"] = np.std(correct_groups_list)
+        # results["correct_groups_list"] = correct_groups_list
         with open(self.results_path + "/batch_output.json", "w") as f:
             json.dump(results, f)
 
@@ -203,5 +216,6 @@ class Evaluate:
 
 if __name__ == "__main__":
     args = get_args()
-    evaluator = Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.split, args.seed)
-    evaluator.task1_grouping_evaluation() if args.task == "task1-grouping" else evaluator.task2_connections_evaluation()
+    evaluator = Evaluate(args.prediction_file, args.predictions_path,
+                         args.dataset_path, args.results_path, args.split, args.seed)
+    evaluator.task1_grouping_evaluation_batch() if args.task == "task1-grouping" else evaluator.task2_connections_evaluation()
