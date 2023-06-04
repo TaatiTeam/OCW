@@ -140,11 +140,11 @@ Note, only one of `"predicted_groups"` or `"predicted_connections"` is required.
 To run the evaluation script:
 
 ```bash
-python evaluate.py \
+python evaluate_only_connect.py \
     --prediction_file "./predictions/task1.json" \
     --dataset_path "./dataset/" \
     --results_path "./results/task1.json" \
-    --task "task1"
+    --task "task1-grouping"
 ```
 
 ### Running the baselines
