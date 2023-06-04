@@ -100,14 +100,14 @@ class Evaluate:
         with open(
             self.results_path + self.prediction_file.split("_")[-2].split("/")[-1] + "_results.json", "w"
         ) as f:
-            json.dump(oc_eval_results, f)
+            json.dump(oc_eval_results, f, indent=2)
 
-        print("results saved to: ", self.results_path)
+        print("\n results saved to: ", self.results_path)
 
     def task1_grouping_evaluation_batch(self):
         json_files = [pos_json for pos_json in os.listdir(self.prediction_path) if pos_json.endswith("_predictions.json")]
         self.results_path = self.results_path + self.prediction_path.split("/")[-1] + '/'
-        for file in json_files:
+        for file in tqdm(json_files):
             self.prediction_file = self.prediction_path + '/' + file
             self.WD = []
             self.NMI = []
@@ -157,7 +157,7 @@ class Evaluate:
         results["std_correct_groups"] = np.std(correct_groups_list)
         # results["correct_groups_list"] = correct_groups_list
         with open(self.results_path + "/batch_output.json", "w") as f:
-            json.dump(results, f)
+            json.dump(results, f, indent=2)
 
     def task2_connections_evaluation(self):
         utils.set_seed(seed=self.seed)

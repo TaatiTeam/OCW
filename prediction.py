@@ -69,7 +69,13 @@ class ModelPrediction:
                 plot_wall(self.model_name, wall_embed, wall, clf_embeds, self.seed, dim_reduction=self.dim_reduction)
             # step 3 => get the clusters
             predicted_groups = get_clusters(clf_embeds, wall['words'])
-            wall_json = {'wall_id': wall['wall_id'], 'predicted_groups': predicted_groups}
+            wall_json = {'wall_id': wall['wall_id'],
+                         'predicted_groups': predicted_groups,
+                         'predicted_connections': None,
+                         'gt_groups': [wall['groups']['group_1']['gt_words'], wall['groups']['group_2']['gt_words'],
+                                       wall['groups']['group_3']['gt_words'], wall['groups']['group_4']['gt_words']],
+                         'gt_connections': wall['gt_connections']
+            }
             oc_results.append(wall_json)
         # print('\n total oov words: {} out of {}'.format(sum(lst_oov), len(lst_oov)*16))
         # print('\n')
@@ -81,7 +87,7 @@ class ModelPrediction:
         if self.contextual:
             model_saved_name = model_saved_name.replace('-seed', '-contextual-seed')
         with open(self.predictions_path + model_saved_name, 'w') as f:
-            json.dump(oc_results, f)
+            json.dump(oc_results, f, ensure_ascii=False, indent=2)
         print('\n predictions saved to: ', self.predictions_path)
 
     def average_prediction(self, number_of_runs=16):
