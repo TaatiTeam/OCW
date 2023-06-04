@@ -1,6 +1,5 @@
 from flair.embeddings import ELMoEmbeddings, WordEmbeddings, BytePairEmbeddings, \
-    StackedEmbeddings, TransformerWordEmbeddings, TransformerDocumentEmbeddings
-from sentence_transformers import SentenceTransformer
+    StackedEmbeddings, TransformerWordEmbeddings, TransformerDocumentEmbeddings, DocumentPoolEmbeddings
 from utils import *
 from tqdm.auto import tqdm
 from evaluate_only_connect import Evaluate
@@ -27,17 +26,12 @@ class ModelPrediction:
         try:
             if self.model_name == 'elmo':
                 spare_model = ELMoEmbeddings('large')
-            # elif self.model_name == 'glove':
-            #     spare_model = WordEmbeddings(self.model_name)
+
             elif self.model_name in ['glove', 'crawl', 'news']:
-                spare_model = StackedEmbeddings(
-                                [
-                                    # standard FastText word embeddings for English
-                                    WordEmbeddings(self.model_name),
-                                    # Byte pair embeddings for English
-                                    BytePairEmbeddings('en'),
-                                ]
-                            )
+                # embedding that performs mean pooling by default
+                # Byte pair embeddings to handle OOV words
+                spare_model = DocumentPoolEmbeddings([WordEmbeddings(self.model_name), BytePairEmbeddings('en')])
+
             else:
                 if self.contextual:
                     spare_model = TransformerWordEmbeddings(self.model_name)
@@ -54,14 +48,12 @@ class ModelPrediction:
         for wall in tqdm(self.DATASET[self.split]):
             if isinstance(shuffle_seed, int):
                 wall['words'] = random.Random(shuffle_seed).sample(wall['words'], len(wall['words']))
-            # step 1 => get model's contextual embeddings
+            # step 1 => get model's embeddings
             if self.contextual or self.model_name  == 'elmo':
                 wall_embed = get_embeddings(spare_model, wall['words'])
                 if self.model_name == 'elmo' and not self.contextual:
                     # first 1024 embeddings of elmo are static
                     wall_embed = wall_embed[:, :1024]
-            elif self.model_name in ['glove', 'crawl', 'news']:
-                wall_embed = get_embeddings_classic(spare_model, wall['words'])
             else:
                 wall_embed = get_embeddings_static(spare_model, wall['words'])
             # optional step: find number of oov words
@@ -113,5 +105,5 @@ if __name__ == '__main__':
     path = args.predictions_path + args.model_name.replace('/', '-')
     if args.contextual:
         path = path + '-contextual'
-    Evaluate(args.prediction_file, args.dataset_path, args.results_path, args.split,
-             args.seed).task1_grouping_evaluation_batch(path)
+    Evaluate(args.prediction_file, path, args.dataset_path, args.results_path, args.split,
+             args.seed).task1_grouping_evaluation_batch()

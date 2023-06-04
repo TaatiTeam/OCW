@@ -40,45 +40,6 @@ def get_embeddings_static(embeddings, sentences):
         lst_embeddings.append(sent.embedding)
     return torch.stack(lst_embeddings).float()
 
-# function to get classic embeddings from FLair Library and take care of OOV
-# performs mean pooling
-def get_embeddings_classic(embeddings, sentences):
-    lst_embeddings = []
-    sentences_copy = lower_case(sentences.copy())
-    for sentence in sentences_copy:
-        aggregated_embedding = 0
-        for token in re.split(' ', sentence):
-            sent = Sentence(token)
-            embeddings.embed(sent)
-            aggregated_embedding = torch.add(aggregated_embedding, sent.tokens[0].embedding)
-        aggregated_embedding /= len(sentence)
-        lst_embeddings.append(aggregated_embedding)
-    return torch.stack(lst_embeddings).float()
-
-
-
-
-    lst_embed = []
-    for token in sentence:
-        lst_sub_embed = []
-        lst_add = 0
-        try:
-            lst_embed.append(torch.as_tensor(embeddings[token]))
-        except:
-            if len(token.split(' ')) > 1:
-                token = [i for i in token.split(' ') if i not in stopwords.words('english')]
-                for tokens in token:
-                    try:
-                        lst_sub_embed.append(embeddings[tokens])
-                    except:
-                        lst_sub_embed.append(np.zeros(300))
-                for i in lst_sub_embed:
-                    lst_add += i
-                    lst_add = lst_add / len(lst_sub_embed)
-                lst_embed.append(torch.as_tensor(lst_add))
-            else:
-                lst_embed.append(torch.zeros(300))
-    return torch.stack(lst_embed).float()
 
 # set seeds
 def set_seed(seed=42):
