@@ -218,4 +218,10 @@ if __name__ == "__main__":
     args = get_args()
     evaluator = Evaluate(args.prediction_file, args.predictions_path,
                          args.dataset_path, args.results_path, args.split, args.seed)
-    evaluator.task1_grouping_evaluation_batch() if args.task == "task1-grouping" else evaluator.task2_connections_evaluation()
+    if args.task == "task1-grouping":
+        if args.prediction_file.endswith(".json"):
+            evaluator.task1_grouping_evaluation()
+        else:
+            evaluator.task1_grouping_evaluation_batch()
+    else:
+        evaluator.task2_connections_evaluation()
