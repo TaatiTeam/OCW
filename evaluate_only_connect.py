@@ -2,7 +2,8 @@ import json
 import os
 
 import numpy as np
-from sklearn.metrics import normalized_mutual_info_score as nmi
+# from sklearn.metrics import normalized_mutual_info_score as nmi
+from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
 from scipy.stats import wasserstein_distance as wd
@@ -25,7 +26,7 @@ class Evaluate:
 
         # Task 1 - grouping metrics
         self.WD = []
-        self.NMI = []
+        self.AMI = []
         self.FULL_WALL = 0
         self.CORRECT_GROUPS = 0
         # Task 1 - additional metrics
@@ -56,7 +57,7 @@ class Evaluate:
             pred_lst = [item for sublist in pred_sorted for item in sublist]
             index_gt = utils.clue2group(gt_lst, gt_lst)
             index_pred = utils.clue2group(pred_lst, gt_lst)
-            nmi_val = nmi(index_gt, index_pred)
+            ami_val = ami(index_gt, index_pred)
             # additional metrics
             ari_val = ari(index_gt, index_pred)
             fms_val = fms(index_gt, index_pred)
@@ -69,7 +70,7 @@ class Evaluate:
 
             # normalize wd to be in [0, 1]
             self.WD.append(wd_val/4)
-            self.NMI.append(nmi_val)
+            self.AMI.append(ami_val)
             # additional metrics
             self.ARI.append(ari_val)
             self.FMS.append(fms_val)
@@ -78,7 +79,7 @@ class Evaluate:
                 {
                     "wall_id": wall["wall_id"],
                     "WD": wd_val/4,
-                    "NMI": nmi_val,
+                    "AMI": ami_val,
                     "ARI": ari_val,
                     "FMS": fms_val,
                     "correct_groups": correct_groups,
@@ -86,7 +87,7 @@ class Evaluate:
                 }
             )
         oc_eval_results["global"]["WD"] = np.mean(self.WD)
-        oc_eval_results["global"]["NMI"] = np.mean(self.NMI)
+        oc_eval_results["global"]["AMI"] = np.mean(self.AMI)
         # additional metrics
         oc_eval_results["global"]["ARI"] = np.mean(self.ARI)
         oc_eval_results["global"]["FMS"] = np.mean(self.FMS)
@@ -110,7 +111,7 @@ class Evaluate:
         for file in tqdm(json_files):
             self.prediction_file = self.prediction_path + '/' + file
             self.WD = []
-            self.NMI = []
+            self.AMI = []
             self.FULL_WALL = 0
             self.CORRECT_GROUPS = 0
             # Task 1 - additional metrics
@@ -120,7 +121,7 @@ class Evaluate:
         results_files = [pos_json for pos_json in os.listdir(self.results_path) if pos_json.endswith("_results.json")]
         results = {}
         wd_list = []
-        nmi_list = []
+        ami_list = []
         # additional metrics
         ari_list = []
         fms_list = []
@@ -131,7 +132,7 @@ class Evaluate:
             with open(self.results_path + "/" + file) as f:
                 data = json.load(f)
                 wd_list.append(data["global"]["WD"])
-                nmi_list.append(data["global"]["NMI"])
+                ami_list.append(data["global"]["AMI"])
                 # additional metrics
                 ari_list.append(data["global"]["ARI"])
                 fms_list.append(data["global"]["FMS"])
@@ -140,9 +141,8 @@ class Evaluate:
                 correct_groups_list.append(data["global"]["correct_groups"])
         results["mean_wd"] = np.mean(wd_list)
         results["std_wd"] = np.std(wd_list)
-        results["mean_nmi"] = np.mean(nmi_list)
-        results["std_nmi"] = np.std(nmi_list)
-        # results["nmi_list"] = nmi_list
+        results["mean_ami"] = np.mean(ami_list)
+        results["std_ami"] = np.std(ami_list)
         # additional metrics
         results["mean_ari"] = np.mean(ari_list)
         results["std_ari"] = np.std(ari_list)
@@ -152,10 +152,8 @@ class Evaluate:
 
         results["mean_full_wall"] = np.mean(full_wall_list)
         results["std_full_wall"] = np.std(full_wall_list)
-        # results["full_wall_list"] = full_wall_list
         results["mean_correct_groups"] = np.mean(correct_groups_list)
         results["std_correct_groups"] = np.std(correct_groups_list)
-        # results["correct_groups_list"] = correct_groups_list
         with open(self.results_path + "/batch_output.json", "w") as f:
             json.dump(results, f, indent=2)
 
