@@ -43,7 +43,7 @@ class ModelPrediction:
 
 
     def prediction(self, spare_model, clf, shuffle_seed=None):
-        lst_oov = []
+        # lst_oov = []
         oc_results = []
         for wall in tqdm(self.DATASET[self.split]):
             if isinstance(shuffle_seed, int):
