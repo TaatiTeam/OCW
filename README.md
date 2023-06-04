@@ -2,6 +2,9 @@
 
 The accompanying repo for the Only Connect Dataset.
 
+TODO: link to the paper
+
+
 ## Usage
 
 ### Downloading the dataset
@@ -155,5 +158,5 @@ TODO.
 
 If you use the Only Connect dataset in your work, please consider citing our paper:
 
-TODO.
+TODO
 
