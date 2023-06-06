@@ -120,7 +120,7 @@ dataset = load_dataset(
 We provide a script for evaluating the performance of a model on the dataset. Before running, make sure you have installed the requirements:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements_main.txt
 ```
 
 Then, ensure your model predictions are formatted as follows in a JSON file:
