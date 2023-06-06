@@ -1,6 +1,6 @@
-# Only Connect Dataset
+# Only Connect Wall (OCW) Dataset
 
-The accompanying repo for the Only Connect Dataset.
+The accompanying repo for the Only Connect Wall (OCW) Dataset.
 
 TODO: link to the paper
 
