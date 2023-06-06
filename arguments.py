@@ -29,6 +29,7 @@ def get_args():
         help="Which dimensionality reduction method to use for plotting. Select from tsne, pca, or kernel_pca",
     )
     parse.add_argument("--seed", type=int, default=42, help="the random seeds")
+    parse.add_argument("--shuffle-seed", type=int, default=0, help="the random seeds")
     parse.add_argument(
         "--prediction-file", type=str, default="none", help="Path to predictions file"
     )
