@@ -1,21 +1,34 @@
 import json
 import os
 
+import evaluate
 import numpy as np
+from evaluate import load
+from scipy.stats import wasserstein_distance as wd
+
 # from sklearn.metrics import normalized_mutual_info_score as nmi
 from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
-from scipy.stats import wasserstein_distance as wd
+from sklearn.metrics import normalized_mutual_info_score as nmi
 from tqdm.auto import tqdm
 
 import utils
 from arguments import get_args
-from evaluate import load
+
+evaluate.logging.set_verbosity_error()
+
 
 class Evaluate:
-    def __init__(self, prediction_file=None, prediction_path=None, dataset_path="./",
-                 results_path="./results/", split="test", seed=42):
+    def __init__(
+        self,
+        prediction_file=None,
+        prediction_path=None,
+        dataset_path="./",
+        results_path="./results/",
+        split="test",
+        seed=42,
+    ):
         self.prediction_file = prediction_file
         self.prediction_path = prediction_path
         self.dataset_path = dataset_path
@@ -69,7 +82,7 @@ class Evaluate:
                 wd_val += min(wd(pred_sliced[i], gt_sliced[i]), 1)
 
             # normalize wd to be in [0, 1]
-            self.WD.append(wd_val/4)
+            self.WD.append(wd_val / 4)
             self.AMI.append(ami_val)
             # additional metrics
             self.ARI.append(ari_val)
@@ -78,7 +91,7 @@ class Evaluate:
             oc_eval_results["granular"].append(
                 {
                     "wall_id": wall["wall_id"],
-                    "WD": wd_val/4,
+                    "WD": wd_val / 4,
                     "AMI": ami_val,
                     "ARI": ari_val,
                     "FMS": fms_val,
@@ -99,17 +112,24 @@ class Evaluate:
         if not os.path.exists(self.results_path):
             os.makedirs(self.results_path)
         with open(
-            self.results_path + self.prediction_file.split("_")[-2].split("/")[-1] + "_results.json", "w"
+            self.results_path
+            + self.prediction_file.split("_")[-2].split("/")[-1]
+            + "_results.json",
+            "w",
         ) as f:
             json.dump(oc_eval_results, f, indent=2)
 
         print("\n results saved to: ", self.results_path)
 
     def task1_grouping_evaluation_batch(self):
-        json_files = [pos_json for pos_json in os.listdir(self.prediction_path) if pos_json.endswith("_predictions.json")]
-        self.results_path = self.results_path + self.prediction_path.split("/")[-1] + '/'
+        json_files = [
+            pos_json
+            for pos_json in os.listdir(self.prediction_path)
+            if pos_json.endswith("_predictions.json")
+        ]
+        self.results_path = self.results_path + self.prediction_path.split("/")[-1] + "/"
         for file in tqdm(json_files):
-            self.prediction_file = self.prediction_path + '/' + file
+            self.prediction_file = self.prediction_path + "/" + file
             self.WD = []
             self.AMI = []
             self.FULL_WALL = 0
@@ -118,7 +138,11 @@ class Evaluate:
             self.FMS = []
             self.ARI = []
             self.task1_grouping_evaluation()
-        results_files = [pos_json for pos_json in os.listdir(self.results_path) if pos_json.endswith("_results.json")]
+        results_files = [
+            pos_json
+            for pos_json in os.listdir(self.results_path)
+            if pos_json.endswith("_results.json")
+        ]
         results = {}
         wd_list = []
         ami_list = []
@@ -206,7 +230,8 @@ class Evaluate:
         if not os.path.exists(self.results_path):
             os.makedirs(self.results_path)
         with open(
-                self.results_path + self.prediction_file.split("_")[0].split("/")[-1] + "_results.json", "w"
+            self.results_path + self.prediction_file.split("_")[0].split("/")[-1] + "_results.json",
+            "w",
         ) as f:
             json.dump(oc_eval_results, f, indent=2)
         print("results saved to: ", self.results_path)
@@ -214,8 +239,14 @@ class Evaluate:
 
 if __name__ == "__main__":
     args = get_args()
-    evaluator = Evaluate(args.prediction_file, args.predictions_path,
-                         args.dataset_path, args.results_path, args.split, args.seed)
+    evaluator = Evaluate(
+        args.prediction_file,
+        args.predictions_path,
+        args.dataset_path,
+        args.results_path,
+        args.split,
+        args.seed,
+    )
     if args.task == "task1-grouping":
         if args.prediction_file.endswith(".json"):
             evaluator.task1_grouping_evaluation()
