@@ -138,7 +138,7 @@ Then, ensure your model predictions are formatted as follows in a JSON file:
 }]
 ```
 
-Note, only one of `"predicted_groups"` or `"predicted_connections"` is required. The other can be `null`. In the evaluate script, predicting groups is considered `"task1"` and predicting connections is considered `"task2"`.
+Note, only one of `"predicted_groups"` or `"predicted_connections"` is required. The other can be `null`. In the evaluate script, predicting groups is considered `"task1-grouping"` and predicting connections is considered `"task2-connections"`.
 
 To run the evaluation script:
 
