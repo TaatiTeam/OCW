@@ -1,0 +1,2 @@
+# Automatic code formatting
+black[jupyter]==23.3.0
