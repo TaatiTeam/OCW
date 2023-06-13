@@ -152,7 +152,13 @@ python evaluate_only_connect.py \
 
 ### Running the baselines
 
-TODO.
+#### Word Embeddings and Pre-trained Language Models
+
+TODO
+
+#### Large Language Models
+
+To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
 
 ## Citing
 
