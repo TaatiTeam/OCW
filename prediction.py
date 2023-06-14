@@ -1,18 +1,19 @@
-from flair.embeddings import (
-    ELMoEmbeddings,
-    WordEmbeddings,
-    BytePairEmbeddings,
-    TransformerWordEmbeddings,
-    TransformerDocumentEmbeddings,
-    DocumentPoolEmbeddings,
-)
-import utils as ocw_utils
-from tqdm.auto import tqdm
-from evaluate_only_connect import Evaluate
-from arguments import get_args
-import random
-import os
 import json
+import os
+import random
+
+from flair.embeddings import (
+    BytePairEmbeddings,
+    DocumentPoolEmbeddings,
+    ELMoEmbeddings,
+    TransformerDocumentEmbeddings,
+    TransformerWordEmbeddings,
+    WordEmbeddings,
+)
+from tqdm.auto import tqdm
+import utils as ocw_utils
+from arguments import get_args
+from evaluate_only_connect import Evaluate
 
 
 class ModelPrediction:
@@ -52,7 +53,7 @@ class ModelPrediction:
                     spare_model = TransformerWordEmbeddings(self.model_name)
                 else:
                     spare_model = TransformerDocumentEmbeddings(self.model_name)
-        except Exception:
+        except ValueError:
             raise Exception("Model is not supported")
         return spare_model, clf
 
@@ -80,6 +81,16 @@ class ModelPrediction:
             # lst_oov.append(cnt_oov)
             # step 2 => perform constrained clustering
             clf_embeds = clf.fit_predict(wall_embed.detach().cpu())
+            # Optional Step: plot the clusters
+            if self.plot == "all" or self.plot == wall["wall_id"]:
+                ocw_utils.plot_wall(
+                    self.model_name,
+                    wall_embed,
+                    wall,
+                    clf_embeds,
+                    self.seed,
+                    dim_reduction=self.dim_reduction,
+                )
             # step 3 => get the clusters
             predicted_groups = ocw_utils.get_clusters(clf_embeds, wall["words"])
             wall_json = {

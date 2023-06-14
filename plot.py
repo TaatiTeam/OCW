@@ -1,15 +1,16 @@
-import utils as ocw_utils
-import matplotlib.pyplot as plt
-from scipy.spatial import ConvexHull
-from scipy import interpolate
-from prediction import ModelPrediction
-from arguments import get_args
-from adjustText import adjust_text
-import seaborn as sns
-from matplotlib.colors import ListedColormap
 import os
-import numpy as np
 import random
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from adjustText import adjust_text
+from matplotlib.colors import ListedColormap
+from scipy import interpolate
+from scipy.spatial import ConvexHull
+
+import utils as ocw_utils
+from arguments import get_args
+from prediction import ModelPrediction
 
 
 class PlotWall:

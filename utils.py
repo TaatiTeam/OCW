@@ -1,18 +1,17 @@
-from datasets import load_dataset
-import matplotlib.pyplot as plt
-from flair.data import Sentence
-import flair
-import torch
-from k_means_constrained import KMeansConstrained
-import random
-from sklearn.decomposition import PCA
-from sklearn.decomposition import KernelPCA
-from sklearn.manifold import TSNE
-import numpy as np
 import json
-from transformers import enable_full_determinism
-
+import random
 from typing import List
+
+import flair
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from datasets import load_dataset
+from flair.data import Sentence
+from k_means_constrained import KMeansConstrained
+from sklearn.decomposition import PCA, KernelPCA
+from sklearn.manifold import TSNE
+from transformers import enable_full_determinism
 
 # add your OpenAI API key
 # openai.api_key = open("key.txt", "r").read().strip('\n')
