@@ -189,7 +189,7 @@ To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](run_op
 We welcome contributions to this repository (noticed a typo? a bug?). To propose a change:
 
 ```
-git clone https://github.com/salavina/only_connect_nlp
+git clone https://github.com/salavina/OCW
 cd only_connect_nlp
 git checkout -b my-branch
 pip install -r requirements.txt
@@ -204,7 +204,7 @@ black .
 flake8 .
 ```
 
-Then, submit you change as a pull request.
+Then, submit your change as a pull request.
 
 ## Citing
 
