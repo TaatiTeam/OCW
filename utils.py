@@ -11,8 +11,6 @@ from flair.data import Sentence
 from k_means_constrained import KMeansConstrained
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
-import numpy as np
-import json
 from transformers import enable_full_determinism
 
 # add your OpenAI API key
