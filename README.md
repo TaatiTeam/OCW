@@ -204,7 +204,7 @@ black .
 flake8 .
 ```
 
-Then, submit you change as a pull request.
+Then, submit your change as a pull request.
 
 ## Citing
 
