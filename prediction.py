@@ -27,7 +27,7 @@ class ModelPrediction:
         self,
         contextual=False,
         model_name="elmo",
-        dataset_path="./",
+        dataset_path="./OCW/",
         predictions_path="./predictions/task1/",
         split="test",
         seed=42,

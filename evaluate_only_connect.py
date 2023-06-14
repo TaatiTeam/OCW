@@ -19,7 +19,7 @@ class Evaluate:
         self,
         prediction_file=None,
         prediction_path=None,
-        dataset_path="./",
+        dataset_path="./OCW/",
         results_path="./results/",
         split="test",
         seed=42,

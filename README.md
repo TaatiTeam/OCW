@@ -9,7 +9,13 @@ TODO: link to the paper
 
 ### Downloading the dataset
 
-The dataset can be downloaded from Google Drive [here](https://drive.google.com/drive/folders/1118w_ydBSBWUru5cPlyGY9TMrgd993f3?usp=sharing). There are three files/partitions: `train.json`, `validation.json` and `test.json`.
+The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with bash script:
+    
+```bash
+bash download_OCW.sh
+```
+
+There are four files/partitions:  `OCW.json`, `train.json`, `validation.json` and `test.json`.
 
 Here is an example of the dataset's structure:
 
