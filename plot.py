@@ -9,9 +9,9 @@ from matplotlib.colors import ListedColormap
 from scipy import interpolate
 from scipy.spatial import ConvexHull
 
+import utils as ocw_utils
 from arguments import get_args
 from prediction import ModelPrediction
-from utils import ocw_utils
 
 
 class PlotWall:
