@@ -4,7 +4,6 @@ The accompanying repo for the Only Connect Wall (OCW) Dataset.
 
 TODO: link to the paper
 
-
 ## Usage
 
 ### Downloading the dataset
@@ -184,6 +183,28 @@ python plot.py \
 #### Large Language Models
 
 To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
+
+## Contributing
+
+We welcome contributions to this repository (noticed a typo? a bug?). To propose a change:
+
+```
+git clone https://github.com/salavina/only_connect_nlp
+cd only_connect_nlp
+git checkout -b my-branch
+pip install -r requirements.txt
+pip install -r dev-requirements.txt
+```
+
+Once your changes are made, make sure to lint and format the code (addressing any warnings or errors):
+
+```
+isort .
+black .
+flake8 .
+```
+
+Then, submit you change as a pull request.
 
 ## Citing
 
