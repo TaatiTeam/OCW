@@ -37,7 +37,7 @@ Here is an example of the dataset's structure:
 	"dataset": [{
 		"wall_id": "882c",
 		"season": 1,
-		"episode": 4,
+		"episode": 5,
 		"words": ["Puzzle", "Manhattan", "B", "Wrench", "Smith", "Nuts", "Brooks", "Blanc", "Suit", "Screwdriver", "Sidecar", "Margarita", "Hammer", "Business", "Gimlet", "Gibson"],
 		"gt_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"],
 		"groups": {
@@ -146,7 +146,7 @@ To run the evaluation script:
 python evaluate_only_connect.py \
     --prediction_file "./predictions/task1.json" \
     --dataset_path "./dataset/" \
-    --results_path "./results/task1.json" \
+    --results_path "./results/" \
     --task "task1-grouping"
 ```
 
@@ -154,7 +154,26 @@ python evaluate_only_connect.py \
 
 #### Word Embeddings and Pre-trained Language Models
 
-TODO
+To run word embeddings and PLM baseline:
+    
+```bash
+python prediction.py \
+    --model_name "intfloat/e5-base-v2" \
+    --dataset_path "./dataset/" \
+    --predictions_path "./predictions/" \
+    --task "task1-grouping"
+```
+The `model_name` should be from huggingface model hub or in `['elmo', 'glove', 'crawl', 'news']`.
+To run contextualized embeddings in PLMs, use `--contextual` flag.
+
+To plot the results:
+
+```bash
+python plot.py \
+    --wall_id "8cde" \
+    --model_name "intfloat/e5-base-v2" \
+    --shuffle_seed 9
+```
 
 #### Large Language Models
 
