@@ -6,14 +6,7 @@ from flair.embeddings import (
     TransformerDocumentEmbeddings,
     DocumentPoolEmbeddings,
 )
-from utils import (
-    load_hf_dataset,
-    set_seed,
-    load_clf,
-    get_embeddings,
-    get_embeddings_static,
-    get_clusters,
-)
+import utils as ocw_utils
 from tqdm.auto import tqdm
 from evaluate_only_connect import Evaluate
 from arguments import get_args
@@ -38,11 +31,11 @@ class ModelPrediction:
         self.predictions_path = predictions_path
         self.split = split
         self.seed = seed
-        self.DATASET = load_hf_dataset(self.dataset_path)
+        self.DATASET = ocw_utils.load_hf_dataset(self.dataset_path)
 
     def load_model(self):
-        set_seed(seed=self.seed)
-        clf = load_clf(seed=self.seed)
+        ocw_utils.set_seed(seed=self.seed)
+        clf = ocw_utils.load_clf(seed=self.seed)
         try:
             if self.model_name == "elmo":
                 spare_model = ELMoEmbeddings("large")
@@ -73,12 +66,12 @@ class ModelPrediction:
                 )
             # step 1 => get model's embeddings
             if self.contextual or self.model_name == "elmo":
-                wall_embed = get_embeddings(spare_model, wall["words"])
+                wall_embed = ocw_utils.get_embeddings(spare_model, wall["words"])
                 if self.model_name == "elmo" and not self.contextual:
                     # first 1024 embeddings of elmo are static
                     wall_embed = wall_embed[:, :1024]
             else:
-                wall_embed = get_embeddings_static(spare_model, wall["words"])
+                wall_embed = ocw_utils.get_embeddings_static(spare_model, wall["words"])
             # optional step: find number of oov words
             # cnt_oov = 0
             # for i in wall_embed:
@@ -88,7 +81,7 @@ class ModelPrediction:
             # step 2 => perform constrained clustering
             clf_embeds = clf.fit_predict(wall_embed.detach().cpu())
             # step 3 => get the clusters
-            predicted_groups = get_clusters(clf_embeds, wall["words"])
+            predicted_groups = ocw_utils.get_clusters(clf_embeds, wall["words"])
             wall_json = {
                 "wall_id": wall["wall_id"],
                 "predicted_groups": predicted_groups,

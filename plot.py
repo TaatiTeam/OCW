@@ -1,12 +1,4 @@
-from utils import (
-    load_hf_dataset,
-    load_tsne,
-    load_kpca,
-    load_pca,
-    get_embeddings,
-    get_embeddings_static,
-    clue2group,
-)
+import utils as ocw_utils
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from scipy import interpolate
@@ -42,7 +34,7 @@ class PlotWall:
         self.dim_reduction = dim_reduction
         self.dataset_path = dataset_path
         self.save_path = save_path
-        self.DATASET = load_hf_dataset(self.dataset_path)
+        self.DATASET = ocw_utils.load_hf_dataset(self.dataset_path)
 
     def plot(self):
         for i in self.DATASET[self.split]:
@@ -77,22 +69,22 @@ class PlotWall:
             )
         # step 1 => get model's embeddings
         if self.contextual or self.model_name == "elmo":
-            wall_embed = get_embeddings(spare_model, wall["words"])
+            wall_embed = ocw_utils.get_embeddings(spare_model, wall["words"])
             if self.model_name == "elmo" and not self.contextual:
                 # first 1024 embeddings of elmo are static
                 wall_embed = wall_embed[:, :1024]
         else:
-            wall_embed = get_embeddings_static(spare_model, wall["words"])
+            wall_embed = ocw_utils.get_embeddings_static(spare_model, wall["words"])
         clf_embeds = clf.fit_predict(wall_embed.detach().cpu())
 
         if not os.path.isdir(self.save_path):
             os.mkdir(self.save_path)
         if self.dim_reduction == "tsne":
-            reduction = load_tsne(seed=0).fit_transform(wall_embed.detach().cpu())
+            reduction = ocw_utils.load_tsne(seed=0).fit_transform(wall_embed.detach().cpu())
         elif self.dim_reduction == "pca":
-            reduction = load_pca(seed=self.seed).fit_transform(wall_embed.detach().cpu())
+            reduction = ocw_utils.load_pca(seed=self.seed).fit_transform(wall_embed.detach().cpu())
         elif self.dim_reduction == "kernel_pca":
-            reduction = load_kpca(seed=self.seed).fit_transform(wall_embed.detach().cpu())
+            reduction = ocw_utils.load_kpca(seed=self.seed).fit_transform(wall_embed.detach().cpu())
         else:
             raise ValueError("No Valid Dimentionality Reduction Was Found")
 
@@ -107,7 +99,7 @@ class PlotWall:
         )
         connections = wall["gt_connections"]
         emmbedes_lst = wall["words"]
-        LABEL_TRUE = clue2group(emmbedes_lst, wall1_default)
+        LABEL_TRUE = ocw_utils.clue2group(emmbedes_lst, wall1_default)
         U_LABEL_TRUE = np.unique(LABEL_TRUE)
         # centroids = clf.cluster_centers_
         # colors = ['purple', 'green', 'red', 'blue']

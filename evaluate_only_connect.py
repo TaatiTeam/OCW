@@ -8,7 +8,7 @@ from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
 from tqdm.auto import tqdm
-import utils
+import utils as ocw_utils
 from arguments import get_args
 
 evaluate.logging.set_verbosity_error()
@@ -30,7 +30,7 @@ class Evaluate:
         self.results_path = results_path
         self.split = split
         self.seed = seed
-        self.DATASET = utils.load_hf_dataset(self.dataset_path)
+        self.DATASET = ocw_utils.load_hf_dataset(self.dataset_path)
 
         # Task 1 - grouping metrics
         self.WD = []
@@ -47,32 +47,32 @@ class Evaluate:
         self.BERT_SCORE = []
 
     def task1_grouping_evaluation(self):
-        utils.set_seed(seed=self.seed)
+        ocw_utils.set_seed(seed=self.seed)
         oc_eval_results = {"global": {}, "granular": []}
         if not os.path.exists(self.prediction_file):
             raise Exception("prediction file does not exist")
-        prediction = utils.load_prediction(self.prediction_file)
+        prediction = ocw_utils.load_prediction(self.prediction_file)
         for wall in tqdm(self.DATASET[self.split]):
             gt_words = [i["gt_words"] for i in wall["groups"].values()]
-            pred_words = utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
-            gt_sorted = [sorted(utils.lower_case(i)) for i in gt_words]
-            pred_sorted = [sorted(utils.lower_case(i)) for i in pred_words]
-            correct_groups = utils.check_equal(gt_sorted, pred_sorted)
+            pred_words = ocw_utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
+            gt_sorted = [sorted(ocw_utils.lower_case(i)) for i in gt_words]
+            pred_sorted = [sorted(ocw_utils.lower_case(i)) for i in pred_words]
+            correct_groups = ocw_utils.check_equal(gt_sorted, pred_sorted)
             self.CORRECT_GROUPS += correct_groups
             if correct_groups == 4:
                 self.FULL_WALL += 1
             gt_lst = [item for sublist in gt_sorted for item in sublist]
             pred_lst = [item for sublist in pred_sorted for item in sublist]
-            index_gt = utils.clue2group(gt_lst, gt_lst)
-            index_pred = utils.clue2group(pred_lst, gt_lst)
+            index_gt = ocw_utils.clue2group(gt_lst, gt_lst)
+            index_pred = ocw_utils.clue2group(pred_lst, gt_lst)
             ami_val = ami(index_gt, index_pred)
             # additional metrics
             ari_val = ari(index_gt, index_pred)
             fms_val = fms(index_gt, index_pred)
-            pred_sliced = utils.slice_list(index_pred, 4)
-            gt_sliced = utils.slice_list(index_gt, 4)
+            pred_sliced = ocw_utils.slice_list(index_pred, 4)
+            gt_sliced = ocw_utils.slice_list(index_gt, 4)
             wd_val = 0
-            pred_sliced, gt_sliced = utils.remove_same(pred_sliced, gt_sliced)
+            pred_sliced, gt_sliced = ocw_utils.remove_same(pred_sliced, gt_sliced)
             for i in range(len(pred_sliced)):
                 wd_val += min(wd(pred_sliced[i], gt_sliced[i]), 1)
 
@@ -177,17 +177,17 @@ class Evaluate:
             json.dump(results, f, indent=2)
 
     def task2_connections_evaluation(self):
-        utils.set_seed(seed=self.seed)
+        ocw_utils.set_seed(seed=self.seed)
         exact_match = load("exact_match")
         rouge = load("rouge")
         bertscore = load("bertscore")
         oc_eval_results = {"global": {}, "granular": []}
         if not os.path.exists(self.prediction_file):
             raise Exception("prediction file does not exist")
-        prediction = utils.load_prediction(self.prediction_file)
+        prediction = ocw_utils.load_prediction(self.prediction_file)
         for wall in tqdm(self.DATASET[self.split]):
             gt_connections = wall["gt_connections"]
-            pred_connections = utils.find_wall(wall["wall_id"], prediction)["predicted_connections"]
+            pred_connections = ocw_utils.find_wall(wall["wall_id"], prediction)["predicted_connections"]
             # Lowercase and strip so results are invariant to trailing whitespace and capitalization
             gt_connections = [connection.lower().strip() for connection in gt_connections]
             pred_connections = [connection.lower().strip() for connection in pred_connections]
