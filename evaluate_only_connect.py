@@ -1,6 +1,5 @@
 import json
 import os
-
 import evaluate
 import numpy as np
 from evaluate import load
@@ -9,7 +8,6 @@ from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
 from tqdm.auto import tqdm
-
 import utils
 from arguments import get_args
 

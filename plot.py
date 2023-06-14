@@ -24,8 +24,8 @@ class PlotWall:
         seed=42,
         split="test",
         dim_reduction="tsne",
-        dataset_path="./",
-        save_path="./plots_new/",
+        dataset_path="./OCW/",
+        save_path="./plots/",
     ):
         self.model_name = model_name
         self.wall_id = wall_id
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     args = get_args()
     PlotWall(
         model_name=args.model_name,
-        wall_id=args.plot,
+        wall_id=args.wall_id,
         contextual=args.contextual,
         shuffle_seed=args.shuffle_seed,
         seed=args.seed,

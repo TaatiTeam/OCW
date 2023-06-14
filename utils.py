@@ -11,6 +11,8 @@ from flair.data import Sentence
 from k_means_constrained import KMeansConstrained
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
+import numpy as np
+import json
 from transformers import enable_full_determinism
 
 # add your OpenAI API key
@@ -135,8 +137,6 @@ def clue2group(lst_words, wall1_default):
     for i in range(len(wall1_default)):
         dict_bbb[wall1_default[i]] = lst_default[i]
     lst_words_new = lst_words.copy()
-    # if len(set(lst_words_new)) != len(set(wall1_default)):
-    #     return lst_replaced
     for i in lst_words_new:
         if i in dict_bbb.keys():
             lst_words_new[lst_words_new.index(i)] = dict_bbb[i]

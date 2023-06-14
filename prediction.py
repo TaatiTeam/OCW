@@ -25,8 +25,6 @@ class ModelPrediction:
         dataset_path="./",
         predictions_path="./predictions/task1/",
         split="test",
-        plot="none",
-        dim_reduction="tsne",
         seed=42,
     ):
         self.contextual = contextual
@@ -34,8 +32,6 @@ class ModelPrediction:
         self.dataset_path = dataset_path
         self.predictions_path = predictions_path
         self.split = split
-        self.plot = plot
-        self.dim_reduction = dim_reduction
         self.seed = seed
         self.DATASET = ocw_utils.load_hf_dataset(self.dataset_path)
 
@@ -138,14 +134,13 @@ class ModelPrediction:
 
 if __name__ == "__main__":
     args = get_args()
+    # the model_name should be from huggingface model hub or in ['elmo', 'glove', 'crawl', 'news']
     ModelPrediction(
         args.contextual,
         args.model_name,
         args.dataset_path,
         args.predictions_path,
         args.split,
-        args.plot,
-        args.dim_reduction,
         args.seed,
     ).average_prediction()
     path = args.predictions_path + args.model_name.replace("/", "-")

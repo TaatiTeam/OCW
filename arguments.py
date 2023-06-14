@@ -11,7 +11,7 @@ def get_args():
     parse.add_argument(
         "--model-name", type=str, default="elmo", help="the model name either elmo or HF model"
     )
-    parse.add_argument("--dataset-path", type=str, default="./", help="Path to the OC dataset")
+    parse.add_argument("--dataset-path", type=str, default="./OCW/", help="Path to the OC dataset")
     parse.add_argument(
         "--predictions-path", type=str, default="./predictions/", help="Path to predictions folder"
     )
@@ -26,9 +26,7 @@ def get_args():
         choices=["task1-grouping", "task2-connections"],
         help="Which task to evaluate on. Select from task1 (groups) or task2 (connections)",
     )
-    parse.add_argument(
-        "--plot", type=str, default="none", help="Which wall id to plot. if 'all', plot all walls"
-    )
+    parse.add_argument("--wall-id", type=str, default="none", help="Which wall id to plot.")
     parse.add_argument(
         "--dim-reduction",
         type=str,
