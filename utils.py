@@ -8,10 +8,6 @@ import random
 from sklearn.decomposition import PCA
 from sklearn.decomposition import KernelPCA
 from sklearn.manifold import TSNE
-from scipy.spatial import ConvexHull
-from scipy import interpolate
-import os
-import re
 import numpy as np
 import json
 from transformers import enable_full_determinism
@@ -103,7 +99,7 @@ def load_clf(seed=42):
     return clf
 
 
-### functions useful for new script and dataset ###
+# functions useful for new script and dataset
 def load_hf_dataset(dataset_path):
     dataset = load_dataset(
         "json",
@@ -135,14 +131,11 @@ def get_clusters(clf_embeds_final, wall_1):
 
 def clue2group(lst_words, wall1_default):
     dict_bbb = {}
-    lst_aaa_new = []
     lst_default = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
     lst_replaced = [i for i in range(4, 20)]
     for i in range(len(wall1_default)):
         dict_bbb[wall1_default[i]] = lst_default[i]
     lst_words_new = lst_words.copy()
-    # if len(set(lst_words_new)) != len(set(wall1_default)):
-    #     return lst_replaced
     for i in lst_words_new:
         if i in dict_bbb.keys():
             lst_words_new[lst_words_new.index(i)] = dict_bbb[i]

@@ -2,16 +2,24 @@ from flair.embeddings import (
     ELMoEmbeddings,
     WordEmbeddings,
     BytePairEmbeddings,
-    StackedEmbeddings,
     TransformerWordEmbeddings,
     TransformerDocumentEmbeddings,
     DocumentPoolEmbeddings,
 )
-from utils import *
+from utils import (
+    load_hf_dataset,
+    set_seed,
+    load_clf,
+    get_embeddings,
+    get_embeddings_static,
+    get_clusters,
+)
 from tqdm.auto import tqdm
 from evaluate_only_connect import Evaluate
 from arguments import get_args
 import random
+import os
+import json
 
 
 class ModelPrediction:
@@ -55,7 +63,7 @@ class ModelPrediction:
                     spare_model = TransformerWordEmbeddings(self.model_name)
                 else:
                     spare_model = TransformerDocumentEmbeddings(self.model_name)
-        except:
+        except Exception:
             raise Exception("Model is not supported")
         return spare_model, clf
 
@@ -83,16 +91,6 @@ class ModelPrediction:
             # lst_oov.append(cnt_oov)
             # step 2 => perform constrained clustering
             clf_embeds = clf.fit_predict(wall_embed.detach().cpu())
-            # Optional Step: plot the clusters
-            if self.plot == "all" or self.plot == wall["wall_id"]:
-                plot_wall(
-                    self.model_name,
-                    wall_embed,
-                    wall,
-                    clf_embeds,
-                    self.seed,
-                    dim_reduction=self.dim_reduction,
-                )
             # step 3 => get the clusters
             predicted_groups = get_clusters(clf_embeds, wall["words"])
             wall_json = {
@@ -135,11 +133,7 @@ class ModelPrediction:
 
 if __name__ == "__main__":
     args = get_args()
-    #### the model_name should be from huggingface model hub or in ['elmo', 'glove', 'crawl', 'news'] ###
-    # ModelPrediction(args.contextual, args.model_name, args.dataset_path, args.predictions_path,
-    #                 args.split, args.plot, args.dim_reduction, args.seed).prediction()
-    # Evaluate(args.predictions_path + args.model_name.replace('/', '-') + '_predictions.json'
-    #          , args.dataset_path, args.results_path, args.split, args.seed).task1_grouping_evaluation(shuffle_seed=0)
+    # the model_name should be from huggingface model hub or in ['elmo', 'glove', 'crawl', 'news']
     ModelPrediction(
         args.contextual,
         args.model_name,

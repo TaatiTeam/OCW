@@ -1,18 +1,13 @@
 import json
 import os
-
 import evaluate
 import numpy as np
 from evaluate import load
 from scipy.stats import wasserstein_distance as wd
-
-# from sklearn.metrics import normalized_mutual_info_score as nmi
 from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
-from sklearn.metrics import normalized_mutual_info_score as nmi
 from tqdm.auto import tqdm
-
 import utils
 from arguments import get_args
 

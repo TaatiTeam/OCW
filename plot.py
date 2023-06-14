@@ -1,9 +1,23 @@
-from utils import *
+from utils import (
+    load_hf_dataset,
+    load_tsne,
+    load_kpca,
+    load_pca,
+    get_embeddings,
+    get_embeddings_static,
+    clue2group,
+)
+import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
+from scipy import interpolate
 from prediction import ModelPrediction
 from arguments import get_args
 from adjustText import adjust_text
 import seaborn as sns
 from matplotlib.colors import ListedColormap
+import os
+import numpy as np
+import random
 
 
 class PlotWall:
