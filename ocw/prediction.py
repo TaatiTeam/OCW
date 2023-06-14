@@ -21,8 +21,8 @@ class ModelPrediction:
         self,
         contextual=False,
         model_name="intfloat/e5-base-v2",
-        dataset_path="./dataset/",
-        predictions_path="./predictions/task1/",
+        dataset_path="../dataset/",
+        predictions_path="../predictions/task1/",
         split="test",
         seed=42,
     ):

@@ -23,8 +23,8 @@ class PlotWall:
         seed=42,
         split="test",
         dim_reduction="tsne",
-        dataset_path="./dataset/",
-        save_path="./plots/",
+        dataset_path="../dataset/",
+        save_path="../plots/",
     ):
         self.model_name = model_name
         self.wall_id = wall_id
