@@ -1,3 +1,6 @@
+# Automatic formatting of imports
+isort>=5.12.0
+
 # Checks style, syntax, and other useful errors.
 flake8>=4.0.1
 
