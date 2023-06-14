@@ -1,22 +1,17 @@
-from datasets import load_dataset
-import matplotlib.pyplot as plt
-from flair.data import Sentence
-import flair
-import torch
-from k_means_constrained import KMeansConstrained
-import random
-from sklearn.decomposition import PCA
-from sklearn.decomposition import KernelPCA
-from sklearn.manifold import TSNE
-from scipy.spatial import ConvexHull
-from scipy import interpolate
-import os
-import re
-import numpy as np
 import json
-from transformers import enable_full_determinism
-
+import random
 from typing import List
+
+import flair
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from datasets import load_dataset
+from flair.data import Sentence
+from k_means_constrained import KMeansConstrained
+from sklearn.decomposition import PCA, KernelPCA
+from sklearn.manifold import TSNE
+from transformers import enable_full_determinism
 
 # add your OpenAI API key
 # openai.api_key = open("key.txt", "r").read().strip('\n')
@@ -103,7 +98,7 @@ def load_clf(seed=42):
     return clf
 
 
-### functions useful for new script and dataset ###
+# functions useful for new script and dataset
 def load_hf_dataset(dataset_path):
     dataset = load_dataset(
         "json",
@@ -135,7 +130,6 @@ def get_clusters(clf_embeds_final, wall_1):
 
 def clue2group(lst_words, wall1_default):
     dict_bbb = {}
-    lst_aaa_new = []
     lst_default = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
     lst_replaced = [i for i in range(4, 20)]
     for i in range(len(wall1_default)):
