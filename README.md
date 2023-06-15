@@ -8,7 +8,7 @@ TODO: link to the paper
 
 ### Downloading the dataset
 
-The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with bash script:
+The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW.sh
@@ -148,7 +148,7 @@ Note, only one of `"predicted_groups"` or `"predicted_connections"` is required.
 To run the evaluation script:
 
 ```bash
-python evaluate_only_connect.py \
+python ocw/evaluate_only_connect.py \
     --prediction_file "./predictions/task1.json" \
     --dataset_path "./dataset/" \
     --results_path "./results/" \
@@ -162,7 +162,7 @@ python evaluate_only_connect.py \
 To run word embeddings and PLM baseline:
     
 ```bash
-python prediction.py \
+python ocw/prediction.py \
     --model_name "intfloat/e5-base-v2" \
     --dataset_path "./dataset/" \
     --predictions_path "./predictions/" \
@@ -174,7 +174,7 @@ To run contextualized embeddings in PLMs, use `--contextual` flag.
 To plot the results:
 
 ```bash
-python plot.py \
+python ocw/plot.py \
     --wall_id "8cde" \
     --model_name "intfloat/e5-base-v2" \
     --shuffle_seed 9
@@ -182,7 +182,7 @@ python plot.py \
 
 #### Large Language Models
 
-To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
+To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](./notebooks/run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
 
 ## Contributing
 
@@ -190,7 +190,7 @@ We welcome contributions to this repository (noticed a typo? a bug?). To propose
 
 ```
 git clone https://github.com/salavina/OCW
-cd only_connect_nlp
+cd OCW
 git checkout -b my-branch
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
