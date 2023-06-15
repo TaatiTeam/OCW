@@ -8,7 +8,7 @@ TODO: link to the paper
 
 ### Downloading the dataset
 
-The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with bash script:
+The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW.sh
