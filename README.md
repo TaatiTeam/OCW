@@ -148,8 +148,7 @@ Note, only one of `"predicted_groups"` or `"predicted_connections"` is required.
 To run the evaluation script:
 
 ```bash
-cd ocw
-python evaluate_only_connect.py \
+python ocw/evaluate_only_connect.py \
     --prediction_file "./predictions/task1.json" \
     --dataset_path "./dataset/" \
     --results_path "./results/" \
@@ -163,8 +162,7 @@ python evaluate_only_connect.py \
 To run word embeddings and PLM baseline:
     
 ```bash
-cd ocw
-python prediction.py \
+python ocw/prediction.py \
     --model_name "intfloat/e5-base-v2" \
     --dataset_path "./dataset/" \
     --predictions_path "./predictions/" \
@@ -176,8 +174,7 @@ To run contextualized embeddings in PLMs, use `--contextual` flag.
 To plot the results:
 
 ```bash
-cd ocw
-python plot.py \
+python ocw/plot.py \
     --wall_id "8cde" \
     --model_name "intfloat/e5-base-v2" \
     --shuffle_seed 9
