@@ -148,6 +148,7 @@ Note, only one of `"predicted_groups"` or `"predicted_connections"` is required.
 To run the evaluation script:
 
 ```bash
+cd ocw
 python evaluate_only_connect.py \
     --prediction_file "./predictions/task1.json" \
     --dataset_path "./dataset/" \
@@ -182,7 +183,7 @@ python plot.py \
 
 #### Large Language Models
 
-To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
+To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](./ocw/run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
 
 ## Contributing
 

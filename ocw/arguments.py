@@ -9,9 +9,14 @@ def get_args():
     parse = argparse.ArgumentParser()
     parse.add_argument("--contextual", action="store_true", help="render the demo")
     parse.add_argument(
-        "--model-name", type=str, default="intfloat/e5-base-v2", help="the model name either elmo or HF model"
+        "--model-name",
+        type=str,
+        default="intfloat/e5-base-v2",
+        help="the model name either elmo or HF model",
     )
-    parse.add_argument("--dataset-path", type=str, default="../dataset/", help="Path to the OC dataset")
+    parse.add_argument(
+        "--dataset-path", type=str, default="../dataset/", help="Path to the OC dataset"
+    )
     parse.add_argument(
         "--predictions-path", type=str, default="../predictions/", help="Path to predictions folder"
     )

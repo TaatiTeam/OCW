@@ -3,14 +3,14 @@ import os
 
 import evaluate
 import numpy as np
+import utils as ocw_utils
+from arguments import get_args
 from evaluate import load
 from scipy.stats import wasserstein_distance as wd
 from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
 from tqdm.auto import tqdm
-import utils as ocw_utils
-from arguments import get_args
 
 evaluate.logging.set_verbosity_error()
 
@@ -188,7 +188,9 @@ class Evaluate:
         prediction = ocw_utils.load_prediction(self.prediction_file)
         for wall in tqdm(self.DATASET[self.split]):
             gt_connections = wall["gt_connections"]
-            pred_connections = ocw_utils.find_wall(wall["wall_id"], prediction)["predicted_connections"]
+            pred_connections = ocw_utils.find_wall(wall["wall_id"], prediction)[
+                "predicted_connections"
+            ]
             # Lowercase and strip so results are invariant to trailing whitespace and capitalization
             gt_connections = [connection.lower().strip() for connection in gt_connections]
             pred_connections = [connection.lower().strip() for connection in pred_connections]
