@@ -163,6 +163,7 @@ python evaluate_only_connect.py \
 To run word embeddings and PLM baseline:
     
 ```bash
+cd ocw
 python prediction.py \
     --model_name "intfloat/e5-base-v2" \
     --dataset_path "./dataset/" \
@@ -175,6 +176,7 @@ To run contextualized embeddings in PLMs, use `--contextual` flag.
 To plot the results:
 
 ```bash
+cd ocw
 python plot.py \
     --wall_id "8cde" \
     --model_name "intfloat/e5-base-v2" \
