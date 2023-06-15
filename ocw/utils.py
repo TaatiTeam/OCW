@@ -13,9 +13,6 @@ from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
 from transformers import enable_full_determinism
 
-# add your OpenAI API key
-# os.environ["OPENAI_API_KEY"] = "..."
-
 
 # function to get contextual embeddings from Flair Library
 def get_embeddings(embeddings, sentences):
