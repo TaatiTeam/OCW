@@ -183,7 +183,7 @@ python plot.py \
 
 #### Large Language Models
 
-To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](./ocw/run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
+To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](./notebooks/run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
 
 ## Contributing
 
