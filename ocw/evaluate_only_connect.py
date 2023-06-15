@@ -20,8 +20,8 @@ class Evaluate:
         self,
         prediction_file=None,
         prediction_path=None,
-        dataset_path="./dataset/",
-        results_path="./results/",
+        dataset_path="../dataset/",
+        results_path="../results/",
         split="test",
         seed=42,
     ):
