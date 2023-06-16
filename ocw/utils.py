@@ -16,7 +16,7 @@ from transformers import enable_full_determinism
 
 # function to get contextual embeddings from Flair Library
 def get_embeddings(embeddings, sentences):
-    sentences_copy = lower_case(sentences.copy())
+    sentences_copy = [word.lower() for word in sentences.copy()]
     sent = Sentence(sentences_copy)
     embeddings.embed(sent)
     return torch.stack([token.embedding for token in sent.tokens]).float()
@@ -25,7 +25,7 @@ def get_embeddings(embeddings, sentences):
 # function to get classic embeddings from FLair Library
 def get_embeddings_static(embeddings, sentences):
     lst_embeddings = []
-    sentences_copy = lower_case(sentences.copy())
+    sentences_copy = [word.lower() for word in sentences.copy()]
     for token in sentences_copy:
         sent = Sentence(token)
         embeddings.embed(sent)
@@ -147,15 +147,6 @@ def find_wall(wall_id, preds):
             return i
 
 
-# check number of matches in two lists
-def check_equal(gt_groups: List, pred_groups: List):
-    count = 0
-    for i in gt_groups:
-        if i in pred_groups:
-            count += 1
-    return count
-
-
 def get_number_of_solved_groups(gt_groups: List, pred_groups: List, debug=False):
     count = 0
     for y in gt_groups:
@@ -167,11 +158,6 @@ def get_number_of_solved_groups(gt_groups: List, pred_groups: List, debug=False)
     return count
 
 
-# slice a list into n equal sublists
-def slice_list(lst, n):
-    return [lst[i : i + n] for i in range(0, n * n, n)]
-
-
 # remove same items from two lists
 def remove_same(lst1, lst2):
     lst1_new = lst1.copy()
@@ -181,11 +167,3 @@ def remove_same(lst1, lst2):
             lst1_new.remove(i)
             lst2_new.remove(i)
     return lst1_new, lst2_new
-
-
-# lower case a list of words
-def lower_case(lst):
-    lst_new = []
-    for i in lst:
-        lst_new.append(i.lower())
-    return lst_new
