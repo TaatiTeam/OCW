@@ -16,3 +16,4 @@ rouge-score
 bert-score
 seaborn
 adjustText
+typer[rich]
