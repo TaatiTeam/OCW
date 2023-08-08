@@ -1,8 +1,6 @@
 # Only Connect Wall (OCW) Dataset
 
-The accompanying repo for the Only Connect Wall (OCW) Dataset.
-
-TODO: link to the paper
+The accompanying repo for the Only Connect Wall (OCW) Dataset. See [our paper](https://arxiv.org/abs/2306.11167) for more details.
 
 ## Usage
 
@@ -210,5 +208,14 @@ Then, submit your change as a pull request.
 
 If you use the Only Connect dataset in your work, please consider citing our paper:
 
-TODO
+```
+@article{Naeini2023LargeLM,
+	title        = {Large Language Models are Fixated by Red Herrings: Exploring Creative Problem Solving and Einstellung Effect using the Only Connect Wall Dataset},
+	author       = {Saeid Alavi Naeini and Raeid Saqur and Mozhgan Saeidi and John Giorgi and Babak Taati},
+	year         = 2023,
+	journal      = {ArXiv},
+	volume       = {abs/2306.11167},
+	url          = {https://api.semanticscholar.org/CorpusID:259203717}
+}
+```
 
