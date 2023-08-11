@@ -2,12 +2,6 @@ import json
 import os
 import random
 
-<<<<<<< HEAD:ocw/prediction.py
-import utils as ocw_utils
-from arguments import get_args
-from evaluate_only_connect import Evaluate
-=======
->>>>>>> 66e0d5d00f5a78782e5b499dc3c08dbb57506682:scripts/prediction.py
 from flair.embeddings import (
     BytePairEmbeddings,
     DocumentPoolEmbeddings,
