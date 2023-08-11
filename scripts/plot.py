@@ -4,13 +4,14 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import utils as ocw_utils
 from adjustText import adjust_text
-from arguments import get_args
 from matplotlib.colors import ListedColormap
 from prediction import ModelPrediction
 from scipy import interpolate
 from scipy.spatial import ConvexHull
+
+import ocw.utils as ocw_utils
+from ocw.arguments import get_args
 
 
 class PlotWall:

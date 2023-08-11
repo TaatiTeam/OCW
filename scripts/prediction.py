@@ -2,13 +2,19 @@ import json
 import os
 import random
 
-import utils as ocw_utils
-from arguments import get_args
-from evaluate_only_connect import Evaluate
-from flair.embeddings import (BytePairEmbeddings, DocumentPoolEmbeddings,
-                              ELMoEmbeddings, TransformerDocumentEmbeddings,
-                              TransformerWordEmbeddings, WordEmbeddings)
+from flair.embeddings import (
+    BytePairEmbeddings,
+    DocumentPoolEmbeddings,
+    ELMoEmbeddings,
+    TransformerDocumentEmbeddings,
+    TransformerWordEmbeddings,
+    WordEmbeddings,
+)
 from tqdm.auto import tqdm
+
+import ocw.utils as ocw_utils
+from ocw.arguments import get_args
+from ocw.evaluate_only_connect import Evaluate
 
 
 class ModelPrediction:
