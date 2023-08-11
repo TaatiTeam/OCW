@@ -4,7 +4,6 @@ import os
 import evaluate
 import numpy as np
 from evaluate import load
-from more_itertools import chunked
 from scipy.stats import wasserstein_distance as wd
 from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
@@ -58,9 +57,9 @@ class Evaluate:
         for wall in tqdm(self.DATASET[self.split]):
             gt_words = [i["gt_words"] for i in wall["groups"].values()]
             pred_words = ocw_utils.find_wall(wall["wall_id"], prediction)["predicted_groups"]
-            gt_sorted = [sorted(word.lower().strip() for word in group) for group in gt_words]
-            pred_sorted = [sorted(word.lower().strip() for word in group) for group in pred_words]
-            correct_groups = len(set(gt_sorted) & set(pred_sorted))
+            gt_sorted = [sorted(ocw_utils.lower_case(i)) for i in gt_words]
+            pred_sorted = [sorted(ocw_utils.lower_case(i)) for i in pred_words]
+            correct_groups = ocw_utils.check_equal(gt_sorted, pred_sorted)
             self.CORRECT_GROUPS += correct_groups
             if correct_groups == 4:
                 self.FULL_WALL += 1
@@ -72,8 +71,8 @@ class Evaluate:
             # additional metrics
             ari_val = ari(index_gt, index_pred)
             fms_val = fms(index_gt, index_pred)
-            pred_sliced = chunked(index_pred, n=4, strict=True)
-            gt_sliced = chunked(index_gt, n=4, strict=True)
+            pred_sliced = ocw_utils.slice_list(index_pred, 4)
+            gt_sliced = ocw_utils.slice_list(index_gt, 4)
             wd_val = 0
             pred_sliced, gt_sliced = ocw_utils.remove_same(pred_sliced, gt_sliced)
             for i in range(len(pred_sliced)):
