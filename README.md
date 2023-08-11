@@ -96,18 +96,17 @@ Here is an example of the dataset's structure:
 ### Downloading easy datasets for ablation studies
 
 Two easy datasets were generated to experiment the effect of eliminating redherrings:
-\begin{itemize}
-\item Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
+
+* Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW_randomized.sh
 ```
-\item WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
+* WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW_wordnet.sh
 ```
-\end{itemize}
 
 ### Loading the dataset
 
