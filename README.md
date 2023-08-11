@@ -91,6 +91,21 @@ Here is an example of the dataset's structure:
 
 `"season_to_walls_map"` contains counts for the number of walls in each season. `"dataset"` is a list of dictionaries, where each dictionary contains all accompanying information about a wall, including the `"groups"` and each groups ground truth words (`"gt_words"`) and ground truth connections (`"gt_connections"`). Each wall and group has a unique ID. Other metadata, such as human performance, is also included.
 
+### Downloading easy datasets for ablation studies
+
+Two easy datasets were generated to experiment the effect of eliminating redherrings:
+
+* Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
+    
+```bash
+bash download_OCW_randomized.sh
+```
+* WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
+    
+```bash
+bash download_OCW_wordnet.sh
+```
+
 ### Loading the dataset
 
 The three partitions can be loaded the same way as any other JSON file. For example, using Python:
