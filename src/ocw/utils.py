@@ -1,17 +1,20 @@
 import json
 import random
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 import flair
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from datasets import load_dataset
+from datasets import DatasetDict, load_dataset
 from flair.data import Sentence
 from k_means_constrained import KMeansConstrained
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
 from transformers import enable_full_determinism
+
+from ocw.common import TEST_FN, TRAIN_FN, VALID_FN
 
 
 # function to get contextual embeddings from Flair Library
@@ -95,14 +98,15 @@ def load_clf(seed=42):
     return clf
 
 
-# functions useful for new script and dataset
-def load_hf_dataset(dataset_path):
+def load_hf_dataset(dataset_path: Union[str, Path]) -> DatasetDict:
+    """Load dataset using the HuggingFace Datasets library"""
+    dataset_path = Path(dataset_path)
     dataset = load_dataset(
         "json",
         data_files={
-            "train": dataset_path + "train.json",
-            "validation": dataset_path + "validation.json",
-            "test": dataset_path + "test.json",
+            "train": str(dataset_path / TRAIN_FN),
+            "validation": str(dataset_path / VALID_FN),
+            "test": str(dataset_path / TEST_FN),
         },
         field="dataset",
     )

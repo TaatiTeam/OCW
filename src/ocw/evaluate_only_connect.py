@@ -3,8 +3,6 @@ import os
 
 import evaluate
 import numpy as np
-import utils as ocw_utils
-from arguments import get_args
 from evaluate import load
 from more_itertools import chunked
 from scipy.stats import wasserstein_distance as wd
@@ -12,6 +10,9 @@ from sklearn.metrics import adjusted_mutual_info_score as ami
 from sklearn.metrics import adjusted_rand_score as ari
 from sklearn.metrics import fowlkes_mallows_score as fms
 from tqdm.auto import tqdm
+
+import ocw.utils as ocw_utils
+from ocw.arguments import get_args
 
 evaluate.logging.set_verbosity_error()
 

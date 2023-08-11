@@ -1,8 +1,6 @@
 # Only Connect Wall (OCW) Dataset
 
-The accompanying repo for the Only Connect Wall (OCW) Dataset.
-
-TODO: link to the paper
+The accompanying repo for the Only Connect Wall (OCW) Dataset. See [our paper](https://arxiv.org/abs/2306.11167) for more details.
 
 ## Usage
 
@@ -137,10 +135,11 @@ dataset = load_dataset(
 
 ### Evaluating
 
-We provide a script for evaluating the performance of a model on the dataset. Before running, make sure you have installed the requirements:
+We provide a script for evaluating the performance of a model on the dataset. Before running, make sure you have installed the requirements and package:
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 Then, ensure your model predictions are formatted as follows in a JSON file:
@@ -163,10 +162,10 @@ Note, only one of `"predicted_groups"` or `"predicted_connections"` is required.
 To run the evaluation script:
 
 ```bash
-python ocw/evaluate_only_connect.py \
-    --prediction_file "./predictions/task1.json" \
-    --dataset_path "./dataset/" \
-    --results_path "./results/" \
+python src/ocw/evaluate_only_connect.py \
+    --prediction-file "./predictions/task1.json" \
+    --dataset-path "./dataset/" \
+    --results-path "./results/" \
     --task "task1-grouping"
 ```
 
@@ -177,10 +176,10 @@ python ocw/evaluate_only_connect.py \
 To run word embeddings and PLM baseline:
     
 ```bash
-python ocw/prediction.py \
-    --model_name "intfloat/e5-base-v2" \
-    --dataset_path "./dataset/" \
-    --predictions_path "./predictions/" \
+python scripts/prediction.py \
+    --model-name "intfloat/e5-base-v2" \
+    --dataset-path "./dataset/" \
+    --predictions-path "./predictions/" \
     --task "task1-grouping"
 ```
 The `model_name` should be from huggingface model hub or in `['elmo', 'glove', 'crawl', 'news']`.
@@ -189,10 +188,10 @@ To run contextualized embeddings in PLMs, use `--contextual` flag.
 To plot the results:
 
 ```bash
-python ocw/plot.py \
-    --wall_id "8cde" \
-    --model_name "intfloat/e5-base-v2" \
-    --shuffle_seed 9
+python scripts/plot.py \
+    --wall-id "8cde" \
+    --model-name "intfloat/e5-base-v2" \
+    --shuffle-seed 9
 ```
 
 #### Large Language Models
@@ -225,5 +224,14 @@ Then, submit your change as a pull request.
 
 If you use the Only Connect dataset in your work, please consider citing our paper:
 
-TODO
+```
+@article{Naeini2023LargeLM,
+	title        = {Large Language Models are Fixated by Red Herrings: Exploring Creative Problem Solving and Einstellung Effect using the Only Connect Wall Dataset},
+	author       = {Saeid Alavi Naeini and Raeid Saqur and Mozhgan Saeidi and John Giorgi and Babak Taati},
+	year         = 2023,
+	journal      = {ArXiv},
+	volume       = {abs/2306.11167},
+	url          = {https://api.semanticscholar.org/CorpusID:259203717}
+}
+```
 

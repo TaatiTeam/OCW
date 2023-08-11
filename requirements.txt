@@ -16,4 +16,8 @@ rouge-score
 bert-score
 seaborn
 adjustText
+<<<<<<< HEAD
 more-itertools>=9.1.0
+=======
+typer[rich]
+>>>>>>> 66e0d5d00f5a78782e5b499dc3c08dbb57506682
