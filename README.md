@@ -17,7 +17,7 @@ bash download_OCW.sh
 The dataset is provided as JSON files, one for each partition: `train.json`, `validation.json` and `test.json`. We also provide a `OCW.json` file that contains all examples across all splits. The splits are sized as follows:
 
 | Split | # Walls | 
-|-------|---------|
+|:-------|:---------:|
 | `train` | 494     |
 | `validation`   | 62      |
 | `test`  | 62      |
