@@ -43,72 +43,116 @@ Here is an example of the dataset's structure:
 
 ```json
 {
-	"season_to_walls_map": {
-		"1": {"num_walls": 30, "start_date": "15/09/2008", "end_date": "22/12/2008"},
-		"2": {"num_walls": 16, "start_date": "13/07/2009", "end_date": "31/08/2009"},
-		"3": {"num_walls": 30, "start_date": "04/01/2010", "end_date": "12/04/2010"},
-		"4": {"num_walls": 32, "start_date": "06/09/2010", "end_date": "27/12/2010"},
-		"5": {"num_walls": 32, "start_date": "15/08/2011", "end_date": "05/12/2011"},
-		"6": {"num_walls": 32, "start_date": "27/08/2012", "end_date": "17/12/2012"},
-		"7": {"num_walls": 26, "start_date": "13/05/2013", "end_date": "05/08/2013"},
-		"8": {"num_walls": 26, "start_date": "23/09/2013", "end_date": "23/12/2013"},
-		"9": {"num_walls": 26, "start_date": "14/04/2014", "end_date": "07/07/2014"},
-		"10": {"num_walls": 54, "start_date": "01/09/2014", "end_date": "30/03/2015"},
-		"11": {"num_walls": 54, "start_date": "13/07/2015", "end_date": "18/01/2016"},
-		"12": {"num_walls": 74, "start_date": "11/07/2016", "end_date": "07/04/2017"},
-		"13": {"num_walls": 74, "start_date": "28/07/2017", "end_date": "30/04/2018"},
-		"14": {"num_walls": 56, "start_date": "22/10/2018", "end_date": "29/04/2019"},
-		"15": {"num_walls": 56, "start_date": "02/09/2019", "end_date": "30/03/2020"}
-	},
-	"dataset": [{
-        "wall_id": "882c",
-        "season": 1,
-        "episode": 5,
-        "words": ["Puzzle", "Manhattan", "B", "Wrench", "Smith", "Nuts", "Brooks", "Blanc", "Suit", "Screwdriver", "Sidecar", "Margarita", "Hammer", "Business", "Gimlet", "Gibson"],
-        "gt_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"],
-        "groups": {
-            "group_1": {
-                "group_id": "882c_01",
-                "gt_words": ["Blanc", "Brooks", "B", "Smith"],
-                "gt_connection": "Famous Mels",
-                "human_performance": {
-                    "grouping": 1,
-                    "connection": 1
-                }
-            },
-            "group_2": {
-                "group_id": "882c_02",
-                "gt_words": ["Screwdriver", "Hammer", "Gimlet", "Wrench"],
-                "gt_connection": "Household tools",
-                "human_performance": {
-                    "grouping": 1,
-                    "connection": 1
-                }
-            },
-            "group_3": {
-                "group_id": "882c_03",
-                "gt_words": ["Sidecar", "Manhattan", "Gibson", "Margarita"],
-                "gt_connection": "Cocktails",
-                "human_performance": {
-                    "grouping": 1,
-                    "connection": 1
-                }
-            },
-            "group_4": {
-                "group_id": "882c_04",
-                "gt_words": ["Puzzle", "Business", "Nuts", "Suit"],
-                "gt_connection": "Monkey ___",
-                "human_performance": {
-                    "grouping": 1,
-                    "connection": 1
-                }
-            }
+  "season_to_walls_map": {
+    "1": {
+      "num_walls": 30,
+      "start_date": "15/09/2008",
+      "end_date": "22/12/2008"
+    }
+  },
+  "dataset": [
+    {
+      "wall_id": "882c",
+      "season": 1,
+      "episode": 5,
+      "words": [
+        "Puzzle",
+        "Manhattan",
+        "B",
+        "Wrench",
+        "Smith",
+        "Nuts",
+        "Brooks",
+        "Blanc",
+        "Suit",
+        "Screwdriver",
+        "Sidecar",
+        "Margarita",
+        "Hammer",
+        "Business",
+        "Gimlet",
+        "Gibson"
+      ],
+      "gt_connections": [
+        "Famous Mels",
+        "Household tools",
+        "Cocktails",
+        "Monkey ___"
+      ],
+      "groups": {
+        "group_1": {
+          "group_id": "882c_01",
+          "gt_words": [
+            "Blanc",
+            "Brooks",
+            "B",
+            "Smith"
+          ],
+          "gt_connection": "Famous Mels",
+          "human_performance": {
+            "grouping": 1,
+            "connection": 1
+          }
         },
-        "overall_human_performance": {
-            "grouping": [1, 1, 1, 1],
-            "connections": [1, 1, 1, 1]
+        "group_2": {
+          "group_id": "882c_02",
+          "gt_words": [
+            "Screwdriver",
+            "Hammer",
+            "Gimlet",
+            "Wrench"
+          ],
+          "gt_connection": "Household tools",
+          "human_performance": {
+            "grouping": 1,
+            "connection": 1
+          }
+        },
+        "group_3": {
+          "group_id": "882c_03",
+          "gt_words": [
+            "Sidecar",
+            "Manhattan",
+            "Gibson",
+            "Margarita"
+          ],
+          "gt_connection": "Cocktails",
+          "human_performance": {
+            "grouping": 1,
+            "connection": 1
+          }
+        },
+        "group_4": {
+          "group_id": "882c_04",
+          "gt_words": [
+            "Puzzle",
+            "Business",
+            "Nuts",
+            "Suit"
+          ],
+          "gt_connection": "Monkey ___",
+          "human_performance": {
+            "grouping": 1,
+            "connection": 1
+          }
         }
-    }]
+      },
+      "overall_human_performance": {
+        "grouping": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "connections": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  ]
 }
 ```
 
