@@ -113,7 +113,7 @@ Here is an example of the dataset's structure:
 }
 ```
 
-Where
+where
 
 - `"season_to_walls_map"` contains counts for the number of walls in each season
 - `"dataset"` is a list of dictionaries, where each dictionary contains all accompanying information about a wall:
