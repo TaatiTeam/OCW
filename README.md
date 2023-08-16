@@ -1,6 +1,6 @@
 # Only Connect Wall (OCW) Dataset
 
-The accompanying repo for the Only Connect Wall (OCW) Dataset. See [our paper](https://arxiv.org/abs/2306.11167) for more details.
+The Only Connect Wall (OCW) dataset contains 618 walls from the Connecting Walls segment of the OCW quiz show, collected manually from 15 seasons' worth of episodes. Each wall contains ground-truth _groups_ and _connections_ as well as recorded human performance. Please see [our paper](https://arxiv.org/abs/2306.11167) for more details about the dataset.
 
 ## Usage
 
@@ -12,10 +12,17 @@ The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/
 bash download_OCW.sh
 ```
 
-There are four files/partitions:  `OCW.json`, `train.json`, `validation.json` and `test.json`.
+### Dataset structure
+
+The dataset is provided as JSON files, one for each partition: `train.json`, `validation.json` and `test.json`. We also provide a `OCW.json` file that contains all examples across all splits. The splits are sized as follows:
+
+| Split | # Walls | 
+|-------|---------|
+| `train` | 494     |
+| `validation`   | 62      |
+| `test`  | 62      |
 
 Here is an example of the dataset's structure:
-
 
 ```json
 {
@@ -89,22 +96,21 @@ Here is an example of the dataset's structure:
 }
 ```
 
-`"season_to_walls_map"` contains counts for the number of walls in each season. `"dataset"` is a list of dictionaries, where each dictionary contains all accompanying information about a wall, including the `"groups"` and each groups ground truth words (`"gt_words"`) and ground truth connections (`"gt_connections"`). Each wall and group has a unique ID. Other metadata, such as human performance, is also included.
+Where
 
-### Downloading easy datasets for ablation studies
-
-Two easy datasets were generated to experiment the effect of eliminating redherrings:
-
-* Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
-    
-```bash
-bash download_OCW_randomized.sh
-```
-* WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
-    
-```bash
-bash download_OCW_wordnet.sh
-```
+- `"season_to_walls_map"` contains counts for the number of walls in each season
+- `"dataset"` is a list of dictionaries, where each dictionary contains all accompanying information about a wall:
+  - `"wall_id"`: a unique string identifier for the wall
+  - `"season"`: an integer representing the season the wall was collected from
+  - `"episode"`: an integer representing the episode the wall was collected from
+  - `"words"`: a list of strings representing the words in the wall in random order
+  - `"gt_connections"`: a list of strings representing the ground truth connections of each group
+  - `"groups`: a dictionary of dictionaries containing the four groups in the wall, each has the following items:
+      - `"group_id"`: a unique string identifier for the group
+      - `"gt_words"`: a list of strings representing the ground truth words in the group
+      - `"gt_connection"`: a string representing the ground truth connection of the group
+      - `"human_performance`: a dictionary containing recorded human performance for the `"grouping"` and `"connection"` tasks
+  - `"overall_human_performance"`: a dictionary containing recorded human performance for the `"grouping"` and `"connection"` tasks for each group in the wall
 
 ### Loading the dataset
 
@@ -167,6 +173,21 @@ python src/ocw/evaluate_only_connect.py \
     --dataset-path "./dataset/" \
     --results-path "./results/" \
     --task "task1-grouping"
+```
+
+### Downloading easy datasets for ablation studies
+
+Two easy datasets were generated to experiment the effect of eliminating redherrings:
+
+* Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
+    
+```bash
+bash download_OCW_randomized.sh
+```
+* WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
+    
+```bash
+bash download_OCW_wordnet.sh
 ```
 
 ### Running the baselines
