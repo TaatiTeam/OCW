@@ -110,7 +110,7 @@ Where
       - `"gt_words"`: a list of strings representing the ground truth words in the group
       - `"gt_connection"`: a string representing the ground truth connection of the group
       - `"human_performance`: a dictionary containing recorded human performance for the `"grouping"` and `"connection"` tasks
-  - `"overall_human_performance"`: a dictionary containing recorded human performance for the `"grouping"` and `"connection"` tasks for each group in the wall
+  - `"overall_human_performance"`: a dictionary containing recorded human performance for the `"grouping"` and `"connections"` tasks for each group in the wall
 
 ### Loading the dataset
 
