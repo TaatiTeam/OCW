@@ -18,9 +18,9 @@ The dataset is provided as JSON files, one for each partition: `train.json`, `va
 
 | Split | # Walls | 
 |:-------|:---------:|
-| `train` | 494     |
+| `train` |   62   |
 | `validation`   | 62      |
-| `test`  | 62      |
+| `test`  | 494      |
 
 Here is an example of the dataset's structure:
 
