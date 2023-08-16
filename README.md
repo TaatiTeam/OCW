@@ -1,8 +1,25 @@
-# Only Connect Wall (OCW) Dataset
+# 🧩 Only Connect Wall (OCW) Dataset
 
-The Only Connect Wall (OCW) dataset contains 618 walls from the Connecting Walls segment of the OCW quiz show, collected manually from 15 seasons' worth of episodes. Each wall contains ground-truth _groups_ and _connections_ as well as recorded human performance. Please see [our paper](https://arxiv.org/abs/2306.11167) for more details about the dataset.
+The Only Connect Wall (OCW) dataset contains 618 _"Connecting Walls"_ from the [Round 3: Connecting Wall](https://en.wikipedia.org/wiki/Only_Connect#Round_3:_Connecting_Wall) segment of the [Only Connect quiz show](https://en.wikipedia.org/wiki/Only_Connect), collected from 15 seasons' worth of episodes. Each wall contains the ground-truth __groups__ and __connections__ as well as recorded human performance. Please see [our paper](https://arxiv.org/abs/2306.11167) for more details about the dataset and its motivations.
 
-## Usage
+## 📋 Table of Contents
+
+- [🧩 Only Connect Wall (OCW) Dataset](#-only-connect-wall-ocw-dataset)
+	- [📋 Table of Contents](#-table-of-contents)
+	- [📖 Usage](#-usage)
+		- [Downloading the dataset](#downloading-the-dataset)
+		- [Dataset structure](#dataset-structure)
+		- [Loading the dataset](#loading-the-dataset)
+		- [Evaluating](#evaluating)
+		- [Downloading easy datasets for ablation studies](#downloading-easy-datasets-for-ablation-studies)
+		- [Running the baselines](#running-the-baselines)
+			- [Word Embeddings and Pre-trained Language Models](#word-embeddings-and-pre-trained-language-models)
+			- [Large Language Models](#large-language-models)
+	- [✍️ Contributing](#️-contributing)
+	- [📝 Citing](#-citing)
+	- [🙏 Acknowledgements](#-acknowledgements)
+
+## 📖 Usage
 
 ### Downloading the dataset
 
@@ -26,73 +43,73 @@ Here is an example of the dataset's structure:
 
 ```json
 {
-	"season_to_walls_map": {
-		"0": 0,
-		"1": 30,
-		"2": 16,
-		"3": 30,
-		"4": 32,
-		"5": 32,
-		"6": 32,
-		"7": 26,
-		"8": 26,
-		"9": 26,
-		"10": 54,
-		"11": 54,
-		"12": 74,
-		"13": 74,
-		"14": 56,
-		"15": 56
-	},
-	"dataset": [{
-		"wall_id": "882c",
-		"season": 1,
-		"episode": 5,
-		"words": ["Puzzle", "Manhattan", "B", "Wrench", "Smith", "Nuts", "Brooks", "Blanc", "Suit", "Screwdriver", "Sidecar", "Margarita", "Hammer", "Business", "Gimlet", "Gibson"],
-		"gt_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"],
-		"groups": {
-			"group_1": {
-				"group_id": "882c_01",
-				"gt_words": ["Blanc", "Brooks", "B", "Smith"],
-				"gt_connection": "Famous Mels",
-				"human_performance": {
-					"grouping": 1,
-					"connection": 1
-				}
-			},
-			"group_2": {
-				"group_id": "882c_02",
-				"gt_words": ["Screwdriver", "Hammer", "Gimlet", "Wrench"],
-				"gt_connection": "Household tools",
-				"human_performance": {
-					"grouping": 1,
-					"connection": 1
-				}
-			},
-			"group_3": {
-				"group_id": "882c_03",
-				"gt_words": ["Sidecar", "Manhattan", "Gibson", "Margarita"],
-				"gt_connection": "Cocktails",
-				"human_performance": {
-					"grouping": 1,
-					"connection": 1
-				}
-			},
-			"group_4": {
-				"group_id": "882c_04",
-				"gt_words": ["Puzzle", "Business", "Nuts", "Suit"],
-				"gt_connection": "Monkey ___",
-				"human_performance": {
-					"grouping": 1,
-					"connection": 1
-				}
-			}
-		},
-		"overall_human_performance": {
-			"grouping": [1, 1, 1, 1],
-			"connections": [1, 1, 1, 1]
-		}
-	}]
+    "season_to_walls_map": {
+        "0": 0,
+        "1": 30,
+        "2": 16,
+        "3": 30,
+        "4": 32,
+        "5": 32,
+        "6": 32,
+        "7": 26,
+        "8": 26,
+        "9": 26,
+        "10": 54,
+        "11": 54,
+        "12": 74,
+        "13": 74,
+        "14": 56,
+        "15": 56
+    },
+    "dataset": [{
+        "wall_id": "882c",
+        "season": 1,
+        "episode": 5,
+        "words": ["Puzzle", "Manhattan", "B", "Wrench", "Smith", "Nuts", "Brooks", "Blanc", "Suit", "Screwdriver", "Sidecar", "Margarita", "Hammer", "Business", "Gimlet", "Gibson"],
+        "gt_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"],
+        "groups": {
+            "group_1": {
+                "group_id": "882c_01",
+                "gt_words": ["Blanc", "Brooks", "B", "Smith"],
+                "gt_connection": "Famous Mels",
+                "human_performance": {
+                    "grouping": 1,
+                    "connection": 1
+                }
+            },
+            "group_2": {
+                "group_id": "882c_02",
+                "gt_words": ["Screwdriver", "Hammer", "Gimlet", "Wrench"],
+                "gt_connection": "Household tools",
+                "human_performance": {
+                    "grouping": 1,
+                    "connection": 1
+                }
+            },
+            "group_3": {
+                "group_id": "882c_03",
+                "gt_words": ["Sidecar", "Manhattan", "Gibson", "Margarita"],
+                "gt_connection": "Cocktails",
+                "human_performance": {
+                    "grouping": 1,
+                    "connection": 1
+                }
+            },
+            "group_4": {
+                "group_id": "882c_04",
+                "gt_words": ["Puzzle", "Business", "Nuts", "Suit"],
+                "gt_connection": "Monkey ___",
+                "human_performance": {
+                    "grouping": 1,
+                    "connection": 1
+                }
+            }
+        },
+        "overall_human_performance": {
+            "grouping": [1, 1, 1, 1],
+            "connections": [1, 1, 1, 1]
+        }
+    }]
 }
 ```
 
@@ -109,8 +126,8 @@ Where
       - `"group_id"`: a unique string identifier for the group
       - `"gt_words"`: a list of strings representing the ground truth words in the group
       - `"gt_connection"`: a string representing the ground truth connection of the group
-      - `"human_performance`: a dictionary containing recorded human performance for the `"grouping"` and `"connection"` tasks
-  - `"overall_human_performance"`: a dictionary containing recorded human performance for the `"grouping"` and `"connections"` tasks for each group in the wall
+      - `"human_performance`: a dictionary containing recorded human performance for the grouping and connections tasks
+  - `"overall_human_performance"`: a dictionary containing recorded human performance for the grouping and connections tasks for each group in the wall
 
 ### Loading the dataset
 
@@ -118,9 +135,9 @@ The three partitions can be loaded the same way as any other JSON file. For exam
 
 ```python
 dataset = {
-    "train": json.load(open("train.json", "r"))["dataset"],
-    "validation": json.load(open("validation.json", "r"))["dataset"],
-    "test": json.load(open("test.json", "r"))["dataset"],
+    "train": json.load(open("./dataset/train.json", "r"))["dataset"],
+    "validation": json.load(open("./dataset/validation.json", "r"))["dataset"],
+    "test": json.load(open("./dataset/test.json", "r"))["dataset"],
 }
 ```
 
@@ -131,9 +148,9 @@ However, it is likely easiest to work with the dataset using the HuggingFace Dat
 dataset = load_dataset(
     "json",
     data_files={
-        "train": "train.json",
-        "validation": "validation.json",
-        "test": "test.json",
+        "train": "./dataset/train.json",
+        "validation": "./dataset/validation.json",
+        "test": "./dataset/test.json",
     },
     field="dataset",
 )
@@ -152,14 +169,14 @@ Then, ensure your model predictions are formatted as follows in a JSON file:
 
 ```json
 [{
-	"wall_id": "882c_01",
-	"predicted_groups": [
-		["Puzzle", "Manhattan", "B", "Wrench"],
-		["Smith", "Nuts", "Brooks", "Blanc"],
-		["Suit", "Screwdriver", "Sidecar", "Margarita"],
-		["Hammer", "Business", "Gimlet", "Gibson"]
-	],
-	"predicted_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"]
+    "wall_id": "882c_01",
+    "predicted_groups": [
+        ["Puzzle", "Manhattan", "B", "Wrench"],
+        ["Smith", "Nuts", "Brooks", "Blanc"],
+        ["Suit", "Screwdriver", "Sidecar", "Margarita"],
+        ["Hammer", "Business", "Gimlet", "Gibson"]
+    ],
+    "predicted_connections": ["Famous Mels", "Household tools", "Cocktails", "Monkey ___"]
 }]
 ```
 
@@ -177,14 +194,14 @@ python src/ocw/evaluate_only_connect.py \
 
 ### Downloading easy datasets for ablation studies
 
-Two easy datasets were generated to experiment the effect of eliminating redherrings:
+We also produced two "easy" versions of the dataset, designed to remove or dramatically reduce the number of red herrings, for abalation:
 
-* Randomized easy test set by randomly selecting groups across walls. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
+- A copy of the dataset where each wall in the test set is replaced with a _random_ selection of groups. No group is repeated twice, and no wall contains two copies of the same clue. The train and validation sets are unmodified. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW_randomized.sh
 ```
-* WordNet dataset by generating equivalent synonyms of words in each wall. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
+- A copy of the dataset generated from WordNet by selecting equivalent synonyms for each clue in a group. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW_wordnet.sh
@@ -219,7 +236,7 @@ python scripts/plot.py \
 
 To run the few-shot in-context LLM baseline, see the [`run_openai.ipynb`](./notebooks/run_openai.ipynb) notebook. Note: this will require an OpenAI API key.
 
-## Contributing
+## ✍️ Contributing
 
 We welcome contributions to this repository (noticed a typo? a bug?). To propose a change:
 
@@ -228,7 +245,7 @@ git clone https://github.com/salavina/OCW
 cd OCW
 git checkout -b my-branch
 pip install -r requirements.txt
-pip install -r dev-requirements.txt
+pip install -e .
 ```
 
 Once your changes are made, make sure to lint and format the code (addressing any warnings or errors):
@@ -241,18 +258,21 @@ flake8 .
 
 Then, submit your change as a pull request.
 
-## Citing
+## 📝 Citing
 
 If you use the Only Connect dataset in your work, please consider citing our paper:
 
 ```
 @article{Naeini2023LargeLM,
-	title        = {Large Language Models are Fixated by Red Herrings: Exploring Creative Problem Solving and Einstellung Effect using the Only Connect Wall Dataset},
-	author       = {Saeid Alavi Naeini and Raeid Saqur and Mozhgan Saeidi and John Giorgi and Babak Taati},
-	year         = 2023,
-	journal      = {ArXiv},
-	volume       = {abs/2306.11167},
-	url          = {https://api.semanticscholar.org/CorpusID:259203717}
+    title        = {Large Language Models are Fixated by Red Herrings: Exploring Creative Problem Solving and Einstellung Effect using the Only Connect Wall Dataset},
+    author       = {Saeid Alavi Naeini and Raeid Saqur and Mozhgan Saeidi and John Giorgi and Babak Taati},
+    year         = 2023,
+    journal      = {ArXiv},
+    volume       = {abs/2306.11167},
+    url          = {https://api.semanticscholar.org/CorpusID:259203717}
 }
 ```
 
+## 🙏 Acknowledgements
+
+We would like the thank the maintainers and contributors of the fan-made and run website [https://ocdb.cc/](https://ocdb.cc/) for providing the data for this dataset. We would also like to thank the creators of the Only Connect quiz show for producing such an entertaining and thought-provoking show.
