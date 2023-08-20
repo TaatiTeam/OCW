@@ -5,19 +5,19 @@ The Only Connect Wall (OCW) dataset contains 618 _"Connecting Walls"_ from the [
 ## 📋 Table of Contents
 
 - [🧩 Only Connect Wall (OCW) Dataset](#-only-connect-wall-ocw-dataset)
-	- [📋 Table of Contents](#-table-of-contents)
-	- [📖 Usage](#-usage)
-		- [Downloading the dataset](#downloading-the-dataset)
-		- [Dataset structure](#dataset-structure)
-		- [Loading the dataset](#loading-the-dataset)
-		- [Evaluating](#evaluating)
-		- [Downloading easy datasets for ablation studies](#downloading-easy-datasets-for-ablation-studies)
-		- [Running the baselines](#running-the-baselines)
-			- [Word Embeddings and Pre-trained Language Models](#word-embeddings-and-pre-trained-language-models)
-			- [Large Language Models](#large-language-models)
-	- [✍️ Contributing](#️-contributing)
-	- [📝 Citing](#-citing)
-	- [🙏 Acknowledgements](#-acknowledgements)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [📖 Usage](#-usage)
+    - [Downloading the dataset](#downloading-the-dataset)
+    - [Dataset structure](#dataset-structure)
+    - [Loading the dataset](#loading-the-dataset)
+    - [Evaluating](#evaluating)
+    - [Downloading easy datasets for ablation studies](#downloading-easy-datasets-for-ablation-studies)
+    - [Running the baselines](#running-the-baselines)
+      - [Word Embeddings and Pre-trained Language Models](#word-embeddings-and-pre-trained-language-models)
+      - [Large Language Models](#large-language-models)
+  - [✍️ Contributing](#️-contributing)
+  - [📝 Citing](#-citing)
+  - [🙏 Acknowledgements](#-acknowledgements)
 
 ## 📖 Usage
 
@@ -188,16 +188,19 @@ However, it is likely easiest to work with the dataset using the HuggingFace Dat
 
 ```python
 # pip install datasets
-dataset = load_dataset(
-    "json",
-    data_files={
-        "train": "./dataset/train.json",
-        "validation": "./dataset/validation.json",
-        "test": "./dataset/test.json",
-    },
-    field="dataset",
-)
+from datasets import load_dataset
+
+dataset = load_dataset("TaatiTeam/OCW")
+
+# The dataset can be used like any other HuggingFace dataset
+# E.g. get the wall_id of the first example in the train set
+dataset["train"]["wall_id"][0]
+# or get the words of the first 10 examples in the test set
+dataset["test"]["words"][0:10]
 ```
+
+> __Note__
+> The HuggingFace copy does not include the `"season_to_walls_map"` 
 
 ### Evaluating
 
@@ -244,10 +247,21 @@ We also produced two "easy" versions of the dataset, designed to remove or drama
 ```bash
 bash download_OCW_randomized.sh
 ```
+
 - A copy of the dataset generated from WordNet by selecting equivalent synonyms for each clue in a group. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_wordnet.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW_wordnet.sh
+```
+
+Both of these datasets can be loaded from HuggingFace Datasets:
+
+```python
+# pip install datasets
+from datasets import load_dataset
+
+ocw_randomized = load_dataset("TaatiTeam/OCW", "ocw_randomized")
+ocw_wordnet = load_dataset("TaatiTeam/OCW", "ocw_wordnet")
 ```
 
 ### Running the baselines
