@@ -184,7 +184,7 @@ dataset = {
 }
 ```
 
-However, it is likely easiest to work with the dataset using the HuggingFace Datasets library:
+However, it is likely easiest to work with the dataset using the [HuggingFace Datasets](https://huggingface.co/datasets) library:
 
 ```python
 # pip install datasets
