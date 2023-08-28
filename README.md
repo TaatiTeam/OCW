@@ -28,7 +28,7 @@ The OCW dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/
 ```bash
 bash download_OCW.sh
 ```
-For ablation datasets (_OCW-Randomized, OCW-WordNet_) download instructions, see [here](#downloading-easy-datasets-for-ablation-studies). 
+For ablation datasets (_OCW-Randomized, OCW-WordNet_) download instructions, see [here](#downloading-additional-datasets-for-ablation-studies). 
 
 ### Dataset structure
 
