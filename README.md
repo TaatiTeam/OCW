@@ -11,7 +11,7 @@ The Only Connect Wall (OCW) dataset contains 618 _"Connecting Walls"_ from the [
     - [Dataset structure](#dataset-structure)
     - [Loading the dataset](#loading-the-dataset)
     - [Evaluating](#evaluating)
-    - [Downloading easy datasets for ablation studies](#downloading-easy-datasets-for-ablation-studies)
+    - [Downloading additional datasets for ablation studies](#downloading-additional-datasets-for-ablation-studies)
     - [Running the baselines](#running-the-baselines)
       - [Word Embeddings and Pre-trained Language Models](#word-embeddings-and-pre-trained-language-models)
       - [Large Language Models](#large-language-models)
@@ -23,11 +23,12 @@ The Only Connect Wall (OCW) dataset contains 618 _"Connecting Walls"_ from the [
 
 ### Downloading the dataset
 
-The dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with a bash script:
+The OCW dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW.tar.gz) or with a bash script:
     
 ```bash
 bash download_OCW.sh
 ```
+For ablation datasets (_OCW-Randomized, OCW-WordNet_) download instructions, see [here](#downloading-easy-datasets-for-ablation-studies). 
 
 ### Dataset structure
 
@@ -238,9 +239,9 @@ python src/ocw/evaluate_only_connect.py \
     --task "task1-grouping"
 ```
 
-### Downloading easy datasets for ablation studies
+### Downloading additional datasets for ablation studies
 
-We also produced two "easy" versions of the dataset, designed to remove or dramatically reduce the number of red herrings, for abalation:
+We also produced two "controlled" versions of the dataset, designed to reduce or entirely remove the number of red herrings, for abalation on 'easier' data:
 
 - A copy of the dataset where each wall in the test set is replaced with a _random_ selection of groups. No group is repeated twice, and no wall contains two copies of the same clue. The train and validation sets are unmodified. This dataset can be downloaded from [here](https://www.cs.toronto.edu/~taati/OCW/OCW_randomized.tar.gz) or with a bash script:
     
