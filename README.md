@@ -1,4 +1,4 @@
-# 🧩 Only Connect Wall (OCW) Dataset
+# 🧩 [NeurIPS 2023] Only Connect Wall (OCW) Dataset
 
 The Only Connect Wall (OCW) dataset contains 618 _"Connecting Walls"_ from the [Round 3: Connecting Wall](https://en.wikipedia.org/wiki/Only_Connect#Round_3:_Connecting_Wall) segment of the [Only Connect quiz show](https://en.wikipedia.org/wiki/Only_Connect), collected from 15 seasons' worth of episodes. Each wall contains the ground-truth __groups__ and __connections__ as well as recorded human performance. Please see [our paper](https://arxiv.org/abs/2306.11167) for more details about the dataset and its motivations.
 
